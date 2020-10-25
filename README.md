@@ -1,2 +1,2 @@
 # TryHackMe Notes
-My notes for TryHackMe
+My notes and scripts for TryHackMe
