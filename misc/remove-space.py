@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
-# Populate input.txt with a text blob, save, run the script, all spaces, new lines, etc saved to output.txt
+# Populate input.txt with a text blob, save, run the script, all spaces, new lines, etc removed and the 
+# the result is saved to output.txt
 
 with open("input.txt", "r") as i:
     test_string = i.read()
