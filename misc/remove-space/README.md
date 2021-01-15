@@ -1,0 +1,1 @@
+Remove spaces and other hidden characters from a text file
