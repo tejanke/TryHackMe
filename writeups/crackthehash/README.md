@@ -191,7 +191,9 @@ Restore.Sub.#1...: Salt:0 Amplifier:0-1 Iteration:2944-2976
 Candidates.#1....: verny -> vegaslas
 Hardware.Mon.#1..: Temp: 40c Fan: 56% Util: 99% Core:1911MHz Mem:3802MHz Bus:8
 
-Looking at 2 days of cracking, didn't want to wait that long.  Checked the answer length we are looking for, 4 chars.  Created new 4 char rockyou.txt and cracked with that.
+Looking at 2 days of cracking, didn't want to wait that long.  Checked the answer length we are looking for, 4 chars.
+
+Created new 4 char rockyou.txt and cracked with that:
 
 awk 'length($1) == 4 { print $1 }' rockyou.txt > 4rockyou.txt
 
