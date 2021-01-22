@@ -191,3 +191,55 @@ Dictionary attacks require wordlists.  There are many available, you can also cr
     ```
 
 # Task 5 - Cracking Windows Authentication Hashes
+NTHash/NTLM hashes can be acquired by dumping the SAM database on a Windows machine by using mimikatz or the AD database file ntds.dit.
+
+* Practical
+
+    * 5460C85BD858A11475115D2DD3A82333
+    ```
+    john --format=nt --wordlist=/usr/share/wordlists/rockyou.txt ntlm.txt
+
+    Using default input encoding: UTF-8
+    Loaded 1 password hash (NT [MD4 128/128 SSE2 4x3])
+    Warning: no OpenMP support for this hash type, consider --fork=2
+    Press 'q' or Ctrl-C to abort, almost any other key for status
+    [removed]         (?)
+    1g 0:00:00:00 DONE (2021-01-21 19:49) 25.00g/s 76800p/s 76800c/s 76800C/s lance..dangerous
+    Use the "--show --format=NT" options to display all of the cracked passwords reliably
+    Session completed
+    ```
+
+# Task 6 - Cracking /etc/shadow Hashes
+The /etc/shadow file stores password hashes, access by privileged users only.
+
+John is very particular about the format when reading a file.  You need to use unshadow to combine /etc/shadow and /etc/passwd.
+
+```
+unshadow [path to passwd] [path to shadow] > unshadow.txt
+```
+
+* Practical
+    ```
+    cat passwd
+    root:x:0:0::/root:/bin/bash
+
+    cat shadow
+    root:$6$Ha.d5nGupBm29pYr$yugXSk24ZljLTAZZagtGwpSQhb3F2DOJtnHrvk7HI2ma4GsuioHp8sm3LJiRJpKfIf7lZQ29qgtH17Q/JDpYM/:18576::::::
+
+    unshadow passwd shadow > unshadowed.txt
+
+    cat unshadowed.txt
+    root:$6$Ha.d5nGupBm29pYr$yugXSk24ZljLTAZZagtGwpSQhb3F2DOJtnHrvk7HI2ma4GsuioHp8sm3LJiRJpKfIf7lZQ29qgtH17Q/JDpYM/:0:0::/root:/bin/bash    
+
+    john --wordlist=/usr/share/wordlists/rockyou.txt --format=sha512crypt unshadowed.txt 
+
+    Using default input encoding: UTF-8
+    Loaded 1 password hash (sha512crypt, crypt(3) $6$ [SHA512 128/128 SSE2 2x])
+    Cost 1 (iteration count) is 5000 for all loaded hashes
+    Will run 2 OpenMP threads
+    Press 'q' or Ctrl-C to abort, almost any other key for status
+    [removed]             (root)
+    1g 0:00:00:01 DONE (2021-01-21 19:58) 0.5649g/s 650.8p/s 650.8c/s 650.8C/s kucing..summer1
+    Use the "--show" option to display all of the cracked passwords reliably
+    Session completed
+    ```
