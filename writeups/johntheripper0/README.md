@@ -243,3 +243,59 @@ unshadow [path to passwd] [path to shadow] > unshadow.txt
     Use the "--show" option to display all of the cracked passwords reliably
     Session completed
     ```
+
+# Task 7 - Single Crack Mode
+Doesn't use a wordlist but instead uses the username you supply as a source to carry out the cracking.  The process itself is called word mangling.
+
+```
+john --single --format=[format] [path to file]
+```
+
+* Joker:7bf6d9bb82bed1302f331fc6b816aada
+    ```
+    hash-identifier 7bf6d9bb82bed1302f331fc6b816aada
+
+    #########################################################################
+    #     __  __                     __           ______    _____           #
+    #    /\ \/\ \                   /\ \         /\__  _\  /\  _ `\         #
+    #    \ \ \_\ \     __      ____ \ \ \___     \/_/\ \/  \ \ \/\ \        #
+    #     \ \  _  \  /'__`\   / ,__\ \ \  _ `\      \ \ \   \ \ \ \ \       #
+    #      \ \ \ \ \/\ \_\ \_/\__, `\ \ \ \ \ \      \_\ \__ \ \ \_\ \      #
+    #       \ \_\ \_\ \___ \_\/\____/  \ \_\ \_\     /\_____\ \ \____/      #
+    #        \/_/\/_/\/__/\/_/\/___/    \/_/\/_/     \/_____/  \/___/  v1.2 #
+    #                                                             By Zion3R #
+    #                                                    www.Blackploit.com #
+    #                                                   Root@Blackploit.com #
+    #########################################################################
+    --------------------------------------------------
+
+    Possible Hashs:
+    [+] MD5
+    [+] Domain Cached Credentials - MD4(MD4(($pass)).(strtolower($username)))
+
+    john --single --format=raw-md5 hash7.txt
+
+    Using default input encoding: UTF-8
+    Loaded 1 password hash (Raw-MD5 [MD5 128/128 SSE2 4x3])
+    Warning: no OpenMP support for this hash type, consider --fork=2
+    Press 'q' or Ctrl-C to abort, almost any other key for status
+    Warning: Only 2 candidates buffered for the current salt, minimum 12 needed for performance.
+    Warning: Only 9 candidates buffered for the current salt, minimum 12 needed for performance.
+    Warning: Only 5 candidates buffered for the current salt, minimum 12 needed for performance.
+    [removed]            (Joker)
+    1g 0:00:00:00 DONE (2021-01-22 17:49) 25.00g/s 4900p/s 4900c/s 4900C/s j0ker..J0k3r
+    Use the "--show --format=Raw-MD5" options to display all of the cracked passwords reliably
+    Session completed
+
+    ```
+
+# Task 8 - Custom Rules
+You can create rules to dynamically create passwords.  This helps if you already have intelligence about the password you are trying to crack, such as systems that tell you there must be a capital letter, a number, and a symbol in the password for it to be accepted for use.
+
+Custom rules are defined in john.conf located in /etc/john or /opt/john.  The custom rules reference is located here: https://www.openwall.com/john/doc/RULES.shtml
+
+```
+john --wordlist=[path to wordlist] --rule=[rule_name] [path to file]
+```
+
+# Task 9 - Cracking Password Protected Zip Files
