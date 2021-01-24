@@ -141,3 +141,63 @@ The /etc directory is a central location for storing configuration files for the
     * $5$ - SHA-256
     * $6$ - SHA-512
 * /etc/hosts - allows you to map hostnames to specific IPs instead of resolving them with DNS
+
+# Task 6 - Find
+The find command allows you to search the filesystem for anything you are looking for
+* Examples
+    * Use find . to search the current directory forward
+    ```
+    manager@py:~$ find . -type f -name index*
+    find . -type f -name index*
+    ./.cache/mozilla/firefox/wj459bjf.default/OfflineCache/index.sqlite
+    ./Desktop/index.html
+    ```
+    * Use find / to search from the root directory forward
+    ```
+    manager@py:~$ find / -type d -name Radiance 2>/dev/null
+    find / -type d -name Radiance 2>/dev/null
+    /usr/share/themes/Radiance
+    /snap/gnome-3-26-1604/59/usr/share/themes/Radiance
+    /snap/gnome-3-26-1604/100/usr/share/themes/Radiance
+    ```
+
+# Task 7 - SUID
+SUID stands for Set User ID and is a permission that lets users execute a file with the permission of another user.  SUID abuse is a common tactic in privilege escalation
+
+* Find all SUID files
+    ```
+    find / -perm -u=s -type f 2>/dev/null
+    ```
+* Example when grep is found with SUID
+    ```
+    Research : https://gtfobins.github.io/
+
+    manager@py:~$ LFILE=/etc/shadow
+    LFILE=/etc/shadow
+    
+    manager@py:~$ /bin/grep '' $LFILE
+    /bin/grep '' $LFILE
+    ```
+
+# Task 8 - Port Forwarding
+Port forwarding allows you to redirect communication from one address/port number to another
+* Useful netstat examples for seeing what is listening
+    * TCP
+    ```
+    netstat -vatnp
+    ```
+    * UDP
+    ```
+    netstat -vanpu
+    ```
+    * Both
+    ```
+    netstat -vatnpu
+    ```
+
+# Task 9 - Enumeration Automation
+A few examples of enumeration automation include linpeas and linenum
+* linpeas
+    * https://github.com/carlospolop/privilege-escalation-awesome-scripts-suite/tree/master/linPEAS
+* linenum
+    * https://github.com/rebootuser/LinEnum
