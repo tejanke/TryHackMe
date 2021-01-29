@@ -27,6 +27,7 @@ https://tryhackme.com/room/bsidesgtthompson
     Nmap done: 1 IP address (1 host up) scanned in 19.90 seconds
     ```
 * Enumeration - nmap review
+
 Tomcat is running on this server, we'll try to browse the site first
 
 * Enumeration - browse Tomcat
@@ -175,6 +176,6 @@ Tomcat is running on this server, we'll try to browse the site first
     [removed]
     ```
 # Review
-Our initial scan found Tomcat installed.  After loading up ZAP and Firefox I manually browsed the site and discovered I could login to the Manager App with default creds.  Once logged in I noticed you could upload a WAR file.  Researching this lead to the discovery of creating a malicious shell with msfvenom.  I created the shell, uploaded the WAR file, and then navigated to the /shell directory in the web page while I had a listener up.  At this point I had a tomcat user shell.  Python tty upgrades didn't work, so I used bash -i and called it good enough.  
+Our initial scan found Tomcat installed.  After loading up ZAP and Firefox I manually browsed the site and discovered I could login to the Manager App with default creds.  Once logged in I noticed you could upload a WAR file.  Researching this lead to the discovery of creating a malicious shell with msfvenom.  I created the shell, uploaded the WAR file, and then navigated to the /shell directory in the web page while I had a listener up.  At this point I had a tomcat user shell.  Python bash tty upgrades didn't work so I used sh instead and then bash -i and called it good enough.  
 
 Looking at the /home directory I found the jack folder was accessible, inside we got the user flag.  Inside the /home/jack directory were two files, id.sh and test.txt.  Id.sh was creating test.txt.  A review of/etc/crontab found a cron job executing every minute as root which was running id.sh.  I setup a second listener and then appended shell code to id.sh since it was 777.  After waiting a minute for the cron job to run I received a root shell on my listener.
