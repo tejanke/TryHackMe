@@ -100,3 +100,19 @@ Filters are put into place as an attempt to block malicious payloads.
     * https://portswigger.net/web-security/cross-site-scripting/cheat-sheet
     * https://owasp.org/www-community/xss-filter-evasion-cheatsheet
     * https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onerror
+
+# Task 9 - Protection Methods & Other Exploits
+Ways to prevent XSS
+* Escaping - escape all user input
+* Validate - do not allow certain characters to be submitted
+* Sanitizing - change unacceptable formats to acceptable formats
+
+Ohter Exploits
+* XSS can have as much impact as other vulnerabilities
+* XSS is most often chained to achieve a bigger/better exploit
+
+Tools
+* BeEF - hook a browser using XSS
+    * https://beefproject.com/
+* XSS payloads
+    * http://xss-payloads.com/
