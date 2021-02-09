@@ -109,3 +109,12 @@ Requests/sec.: 0
 ```
 
 # Task 9 - API Bypassing - Intro
+Research
+
+# Task 10 - API Bypassing - Exploitation
+Look for any type of direct access API that is public
+
+# Task 11 - API Bypassing - Challenge
+Challenge
+
+Grab flag with direct access
