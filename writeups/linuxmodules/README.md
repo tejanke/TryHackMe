@@ -32,7 +32,7 @@ du -a /home/ | grep user
 du --time -d 1 .
 ```
 
-# Task 3 - 0xef
+# Task 3 - grep
 Grep searches a file for a particular pattern of characters and displays all lines that contain that pattern, the pattern searched is referred to as the regular expression
 
 Syntax
@@ -54,7 +54,7 @@ Flags
 * -E - match regular expressions in a string
 * -e - specify multiple patterns
 
-# Task 4 - STROPS
+# Task 4 - tools
 String Manipulations
 
 Tools
@@ -433,3 +433,85 @@ Resources
 * https://www.gnu.org/software/sed/manual/sed.html
 * https://www.tecmint.com/linux-sed-command-tips-tricks/
 
+# Task 8 - xargs
+xargs handles positional arguments in a command
+
+Flags
+* -0 - terminate arguments with null, helps with spaces in filenames
+* -a [file] - read file
+* -d [delimiter] - delimiter
+* -L [int] - max number of non blank inputs
+* -s [int] - buffer size while running xargs
+* -x - exit the command if buffer size exceeded
+* -E [str] - specify end of file string
+* -I [str] - replace occurence in arguments
+* -p - prompt user before running command
+* -r - if input is blank don't run
+* -n [int] - limit of max args
+* -t - verbose
+
+Operations
+* use echo to pass 3 strings as input to xargs, in xargs turn on verbose [-t], rename the input strings to "argVar" [-I argVar], and finally run bash to touch each arg and list it
+    ```
+    echo "file1 file2 file3" | xargs -t -I argVar bash -c '{ touch argVar; ls -lrta argVar; }'
+
+    bash -c '{ touch file1 file2 file3; ls -lrta file1 file2 file3; }'
+    -rw-r--r-- 1 abc abc 0 Feb 13 08:22 file3
+    -rw-r--r-- 1 abc abc 0 Feb 13 08:22 file2
+    -rw-r--r-- 1 abc abc 0 Feb 13 08:22 file1
+    ```
+* use find to look for files recursively from the current directory and pass their null separated names [-print0] (to account for spaces in filenames) to xargs, in xargs change the argument terminator to null [-0] (helps with spaces in filenames), turn on verbose [-t], prompt the user if they wish to run the command [-p], run the command rm -f on each argument
+    ```
+    ls -lrta 
+
+    -rw-r--r-- 1 abc abc 0 Feb 13 08:28 file3
+    -rw-r--r-- 1 abc abc 0 Feb 13 08:28 file2
+    -rw-r--r-- 1 abc abc 0 Feb 13 08:28 file1
+
+    find . -type f -print0 | xargs -0 -t -p rm -f
+    
+    rm -f ./file3 ./file1 ./file2?...y
+    
+    ls
+    ```
+* use find to look for files recursively from the current directory and pass their null separated names [-print0] (to account for spaces in filenames) ignoring any permissions errors [2>/dev/null] to xargs, in xargs change the argument terminator to null [-0] (helps with spaces in filenames), and then run the egrep command, egrep takes a regex pattern in single quotes that will search for 1- any line starting with "r" [^r] 2- that matches an AlPhAnUmEr1C pattern [[[:alnum:]]] and 3- ends with "0" [*0$]
+    ```
+    head flag.txt; wc flag.txt
+    eMFm5ES3tZBwYMfaxbCYv56fwX3eCtJn
+    sWscbzQ8JlghCBcvI7nupl64tbILlUYL
+    8x5y0uPfLWApFlsm3JWbVA0a7E63UdP9
+    QA4TasEIDTIV5GGXRrtDOkmtW74Gsvzm
+    HGIBQPcFebvmjeRcdF0XNxLXNBxX0Yoe
+    h1bTBhyZwACbyopIfNCKgQLOgwLNDZ4c
+    XFckYhk9HvmrypQnTVWZw1Vx6BXcRGvE
+    arReN9OLg5b1gMA2ZJQJtYRm86U4tqwj
+    ai2QuCyiNer0vpEZDeP3pcI1voASQxjF
+    lCHo2Exctjmiq7a7UTT82sNQzEIVeI5C
+    1000  1000 33000 flag.txt
+
+    find . -type f -print0 2>/dev/null | xargs -0 egrep '^r[[:alnum:]]*0$'
+    rAJr4MvzgvIMJ9nPHfy6wWvRbvUM5J90
+    ```
+
+Tips
+* You can escape command line flags with --
+
+Resources
+* https://www.hackingarticles.in/exploiting-wildcard-for-privilege-escalation/
+
+# Task 9 - uniq and sort
+The unique command filters output and removes duplicate lines that are adjacent to each other.  The sort command sorts lines alphabetically and numerically
+
+uniq flags
+* -c - count occurrences of every line
+* -d - only print lines that are repeated
+* -u - only print lines that are already unique
+* -i - ignore case
+
+sort flags
+* -r - reverse order
+* -c - check if file is already sorted
+* -u - sort and remove duplicate lines
+* -o [file] - save output to file
+
+# Task 10 - curl
