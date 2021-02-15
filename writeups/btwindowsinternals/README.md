@@ -51,4 +51,12 @@ Windows subsystem
 
 Smss.exe starts csrss.exe and wininit.exe in session 0, and csrss.exe and winlogon.exe for session 1.  SMSS is also responsible for creating environment variables, virtual memory paging files, and starts winlogon.exe
 
-# Task 5
+# Task 5 csrss.exe
+The Client Server Runtime Process is the user mode side of the Windows subsystem.  It is always running and is critical to system operation.  If the process is killed, it will result in system failure.  It is responsible for the Win32 console window and process thread creation and deletion.
+
+Research
+* https://en.wikipedia.org/wiki/Client/Server_Runtime_Subsystem
+
+# Task 6 wininit.exe
+The Windows Initialization Process is responsible for launching services.exe (Service Control Manager), lsass.exe (Local Security Authority), and lsaiso.exe in Session 0.  lsaiso.exe is a process associated with Credential Guard and Key Guard
+
