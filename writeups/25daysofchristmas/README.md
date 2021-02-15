@@ -88,3 +88,28 @@ A PCAP file is provided and you are asked to do some analysis on it
         Use the "--show" option to display all of the cracked passwords reliably
         Session completed
         ```
+
+# Task 9 - Day 4
+Linux navigation
+
+* Question 1 - list files in a directory
+    * ls -l
+* Question 2 - display the contents of a file
+    * cat file
+* Question 3 - which file contains a string
+    * grep [pattern] file*
+* Question 4 - which file contains an IP address
+    * egrep '([0-9]{1,3}\.[0-9]{1,3})' file*
+* Question 5 - how many users can login to this machine
+    * cat /etc/passwd | grep bash | wc -l
+* Question 6 - what is the SHA1 hash of a file
+    * cat file | sha1sum
+* Question 7 - what is a user's password hash
+    * look for shadow file backups
+    * find / -name shadow* -type f 2>/dev/null
+
+# Task 10 - Day 5
+OSINT
+
+Given an image use OSINT techniques to answer the questions.  Answers started with using exiftool to grab a username.  Search for that username on google to find social media.  Inside social media were links to other items of interest.  Also used Wayback Machine
+
