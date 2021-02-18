@@ -620,3 +620,238 @@ Attack server services
     MySQL [data]> quit
     Bye
     ```
+
+# Task 17
+Hashing and openssl
+
+* Unzip files
+    ```
+    unzip tosend.zip 
+    Archive:  tosend.zip
+    extracting: note1.txt.gpg           
+    extracting: note2_encrypted.txt     
+    inflating: private.key             
+    ```
+* Use md5 sum to grab hash for the note
+    ```
+    cat note1.txt.gpg | md5sum
+    [removed]
+    ```
+* With the password provided, use the private.key with the encrypted note to decrypt it
+    ```
+    openssl rsautl -decrypt -inkey private.key -in note2_encrypted.txt -out dec.txt
+    Enter pass phrase for private.key:
+    ```
+# Task 18 
+Attack a web application
+
+* Enumeration - nmap
+    ```
+    nmap -A -T4 10.10.89.220 | tee nmap.txt
+    Starting Nmap 7.91 ( https://nmap.org ) at 2021-02-17 20:06 EST
+    Nmap scan report for 10.10.89.220
+    Host is up (0.22s latency).
+    Not shown: 998 filtered ports
+    PORT     STATE SERVICE       VERSION
+    80/tcp   open  http          Microsoft IIS httpd 10.0
+    | http-methods: 
+    |_  Potentially risky methods: TRACE
+    |_http-server-header: Microsoft-IIS/10.0
+    |_http-title: IIS Windows Server
+    3389/tcp open  ms-wbt-server Microsoft Terminal Services
+    | rdp-ntlm-info: 
+    |   Target_Name: RETROWEB
+    |   NetBIOS_Domain_Name: RETROWEB
+    |   NetBIOS_Computer_Name: RETROWEB
+    |   DNS_Domain_Name: RetroWeb
+    |   DNS_Computer_Name: RetroWeb
+    |   Product_Version: 10.0.14393
+    |_  System_Time: 2021-02-18T01:06:55+00:00
+    | ssl-cert: Subject: commonName=RetroWeb
+    | Not valid before: 2021-02-17T01:06:21
+    |_Not valid after:  2021-08-19T01:06:21
+    |_ssl-date: 2021-02-18T01:06:58+00:00; +1s from scanner time.
+    Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+    Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+    Nmap done: 1 IP address (1 host up) scanned in 27.80 seconds
+    ```
+* Enumeration - gobuster
+    ```
+    gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u http://10.10.89.220 -t 50 -x txt,html,php
+    ===============================================================
+    Gobuster v3.0.1
+    by OJ Reeves (@TheColonial) & Christian Mehlmauer (@_FireFart_)
+    ===============================================================
+    [+] Url:            http://10.10.89.220
+    [+] Threads:        50
+    [+] Wordlist:       /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+    [+] Status codes:   200,204,301,302,307,401,403
+    [+] User Agent:     gobuster/3.0.1
+    [+] Extensions:     txt,html,php
+    [+] Timeout:        10s
+    ===============================================================
+    2021/02/17 20:08:09 Starting gobuster
+    ===============================================================
+    /retro (Status: 301)
+    Progress: 5951 / 220561 (2.70%)
+    ```
+* Enumeration - gobuster
+    ```
+    gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u http://10.10.89.220/retro -t 50 -x txt,html,php
+    ===============================================================
+    Gobuster v3.0.1
+    by OJ Reeves (@TheColonial) & Christian Mehlmauer (@_FireFart_)
+    ===============================================================
+    [+] Url:            http://10.10.89.220/retro
+    [+] Threads:        50
+    [+] Wordlist:       /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+    [+] Status codes:   200,204,301,302,307,401,403
+    [+] User Agent:     gobuster/3.0.1
+    [+] Extensions:     txt,html,php
+    [+] Timeout:        10s
+    ===============================================================
+    2021/02/17 20:12:19 Starting gobuster
+    ===============================================================
+    /index.php (Status: 301)
+    /wp-content (Status: 301)
+    /wp-login.php (Status: 200)
+    /license.txt (Status: 200)
+    /Index.php (Status: 301)
+    /wp-includes (Status: 301)
+    /README.html (Status: 200)
+    /readme.html (Status: 200)
+    /LICENSE.txt (Status: 200)
+    /wp-trackback.php (Status: 200)
+    /INDEX.php (Status: 301)
+    /License.txt (Status: 200)
+    /wp-admin (Status: 301)
+    /ReadMe.html (Status: 200)
+    /Readme.html (Status: 200)
+    ```
+* Enumeration - wpscan
+    ```
+    wpscan --url http://10.10.89.220/retro --enumerate u
+    _______________________________________________________________      
+            __          _______   _____                                 
+            \ \        / /  __ \ / ____|                                
+            \ \  /\  / /| |__) | (___   ___  __ _ _ __ ®               
+            \ \/  \/ / |  ___/ \___ \ / __|/ _` | '_ \                
+                \  /\  /  | |     ____) | (__| (_| | | | |               
+                \/  \/   |_|    |_____/ \___|\__,_|_| |_|               
+                                                                        
+            WordPress Security Scanner by the WPScan Team               
+                            Version 3.8.14                              
+        Sponsored by Automattic - https://automattic.com/             
+        @_WPScan_, @ethicalhack3r, @erwan_lr, @firefart               
+    _______________________________________________________________      
+                                                                        
+    [i] It seems like you have not updated the database for some time.   
+    [?] Do you want to update now? [Y]es [N]o, default: [N]y             
+    [i] Updating the Database ...                                        
+    [i] Update completed.                                                
+                                                                        
+    [+] URL: http://10.10.89.220/retro/ [10.10.89.220]                   
+    [+] Started: Wed Feb 17 20:18:27 2021                                
+                                                                        
+    Interesting Finding(s):                                              
+                                                                        
+    [+] Headers                                                          
+    | Interesting Entries:                                              
+    |  - Server: Microsoft-IIS/10.0                                     
+    |  - X-Powered-By: PHP/7.1.29                                       
+    | Found By: Headers (Passive Detection)                             
+    | Confidence: 100%    
+                                                                                                                
+    [+] XML-RPC seems to be enabled: http://10.10.89.220/retro/xmlrpc.php                                            
+    | Found By: Direct Access (Aggressive Detection)                                                                
+    | Confidence: 100%                                                                                              
+    | References:                                                                                                   
+    |  - http://codex.wordpress.org/XML-RPC_Pingback_API
+    |  - https://www.rapid7.com/db/modules/auxiliary/scanner/http/wordpress_ghost_scanner
+    |  - https://www.rapid7.com/db/modules/auxiliary/dos/http/wordpress_xmlrpc_dos
+    |  - https://www.rapid7.com/db/modules/auxiliary/scanner/http/wordpress_xmlrpc_login
+    |  - https://www.rapid7.com/db/modules/auxiliary/scanner/http/wordpress_pingback_access
+
+    [+] WordPress readme found: http://10.10.89.220/retro/readme.html
+    | Found By: Direct Access (Aggressive Detection)
+    | Confidence: 100%
+
+    [+] The external WP-Cron seems to be enabled: http://10.10.89.220/retro/wp-cron.php
+    | Found By: Direct Access (Aggressive Detection)
+    | Confidence: 60%
+    | References:
+    |  - https://www.iplocation.net/defend-wordpress-from-ddos
+    |  - https://github.com/wpscanteam/wpscan/issues/1299
+
+    [+] WordPress version 5.2.1 identified (Insecure, released on 2019-05-21).
+    | Found By: Rss Generator (Passive Detection)
+    |  - http://10.10.89.220/retro/index.php/feed/, <generator>https://wordpress.org/?v=5.2.1</generator>
+    |  - http://10.10.89.220/retro/index.php/comments/feed/, <generator>https://wordpress.org/?v=5.2.1</generator>
+
+    [+] WordPress theme in use: 90s-retro                                                                                                                        
+    | Location: http://10.10.89.220/retro/wp-content/themes/90s-retro/                                                                                                               
+    | Latest Version: 1.4.10 (up to date)
+    | Last Updated: 2019-04-15T00:00:00.000Z
+    | Readme: http://10.10.89.220/retro/wp-content/themes/90s-retro/readme.txt
+    | Style URL: http://10.10.89.220/retro/wp-content/themes/90s-retro/style.css?ver=5.2.1
+    | Style Name: 90s Retro
+    | Style URI: https://organicthemes.com/retro-theme/
+    | Description: Have you ever wished your WordPress blog looked like an old Geocities site from the 90s!? Probably n...
+    | Author: Organic Themes
+    | Author URI: https://organicthemes.com
+    |
+    | Found By: Css Style In Homepage (Passive Detection)
+    |
+    | Version: 1.4.10 (80% confidence)
+    | Found By: Style (Passive Detection)
+    |  - http://10.10.89.220/retro/wp-content/themes/90s-retro/style.css?ver=5.2.1, Match: 'Version: 1.4.10'
+
+    [+] Enumerating All Plugins (via Passive Methods)
+
+    [i] No plugins Found.
+
+    [+] Enumerating Config Backups (via Passive and Aggressive Methods)
+    Checking Config Backups - Time: 00:00:01 <==========================================================================================================> (22 / 22) 100.00% Time: 00:00:01
+
+    [i] No Config Backups Found.
+
+    [+] Enumerating Users (via Passive and Aggressive Methods)
+    Brute Forcing Author IDs - Time: 00:00:08 <=========================================================================================================> (10 / 10) 100.00% Time: 00:00:08
+
+    [i] User(s) Identified:
+
+    [+] wade
+    | Found By: Author Posts - Author Pattern (Passive Detection)
+    | Confirmed By:
+    |  Wp Json Api (Aggressive Detection)
+    |   - http://10.10.89.220/retro/index.php/wp-json/wp/v2/users/?per_page=100&page=1
+    |  Author Id Brute Forcing - Author Pattern (Aggressive Detection)
+    |  Login Error Messages (Aggressive Detection)
+
+    [+] Wade
+    | Found By: Rss Generator (Passive Detection)
+    | Confirmed By: Login Error Messages (Aggressive Detection)
+
+    ```
+* Enumeration - browse web site
+    * Notice reference to ready player one avatar, google name
+* Able to login to Wordpress with above
+* Check RDP and was able to login with those creds as well
+* Gaining Access - Login to RDP with the creds above
+* Privilege Escalation
+    * Once you are logged in as a normal user there is an interesting file on the desktop, hhupd
+    * Research
+        * https://www.zerodayinitiative.com/blog/2019/11/19/thanksgiving-treat-easy-as-pie-windows-7-secure-desktop-escalation-of-privilege
+    * Exploit
+        * Double click hhupd
+        * In UAC, click show details
+        * Next click Show information about the publisher's certificate
+        * Next click the Issued By link, this will open a new browser behind the UAC session
+        * Close the UAC prompt
+        * You now have a browser running as NT Authority/SYSTEM
+        * In the browser click Settings > File > Save As
+        * An error will pop up, click OK
+        * In the filename box search for c:\windows\system32
+        * Search for cmd.exe, right click and choose open
+        * You now have a privileged shell
