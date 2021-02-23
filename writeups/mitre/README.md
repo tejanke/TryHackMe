@@ -22,3 +22,19 @@ The MITRE ATT&CK framework is a globally accesible knowledge base of adversary t
 https://attack.mitre.org/
 
 # Task 4 - Car Knowledge Base
+CAR - Cyber Analytics Repository
+
+CAR is a knowledge base of analytics developed by MITRE on the MITRE ATT&CK adversary model.
+
+https://car.mitre.org/
+
+Analytics View
+
+https://car.mitre.org/analytics/
+
+ATT&CK Navigator
+
+https://mitre-attack.github.io/attack-navigator/beta/enterprise/#layerURL=https%3A%2F%2Fraw.githubusercontent.com%2Fmitre-attack%2Fcar%2Fmaster%2Fdocs%2Fcar_attack%2Fcar_attack.json
+
+EQL - Event Query Language - pronounced equal
+
