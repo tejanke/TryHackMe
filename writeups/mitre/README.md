@@ -45,3 +45,12 @@ https://shield.mitre.org/
 
 https://shield.mitre.org/matrix/
 
+# Task 6 - ATT&CK Emulation Plans
+MITRE formed CTID - Center of Threat-Informed Defense.  This organization consists of various companies and vendors to conduct research on cyber threats and their TTPs
+
+https://mitre-engenuity.org/ctid/
+
+The Adversary Emulation Library is a public library making adversary emulation plans a free resource for blue/red teamers.  The 3 ATT&CK Emulation Plans available are: APT3, APT29, and FIN6
+
+https://medium.com/mitre-engenuity/introducing-the-all-new-adversary-emulation-plan-library-234b1d543f6b
+
