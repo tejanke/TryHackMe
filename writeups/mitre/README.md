@@ -38,3 +38,10 @@ https://mitre-attack.github.io/attack-navigator/beta/enterprise/#layerURL=https%
 
 EQL - Event Query Language - pronounced equal
 
+# Task 5 - SHIELD
+Shield is an active defense knowledge base MITRE is developing to capture and organize what we are learning about active defense and adversary engagement.  Shield Active Defense is similar to the ATT&CK Matrix, but the tactics and techniques provided to us enable us to trap and engage with an adversary active within the network
+
+https://shield.mitre.org/
+
+https://shield.mitre.org/matrix/
+
