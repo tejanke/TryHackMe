@@ -54,3 +54,9 @@ The Adversary Emulation Library is a public library making adversary emulation p
 
 https://medium.com/mitre-engenuity/introducing-the-all-new-adversary-emulation-plan-library-234b1d543f6b
 
+# Task 7 - ATT&CK and Threat Intelligence
+Threat Intelligence (TI) or Cyber Threat Intelligence (CTI) is the information, or TTPs, attributed to the adversary.  By using threat intelligence, as defenders, we can make better decisions about defense
+
+https://attack.mitre.org/groups/
+
+# Task 8 - Conclusion
