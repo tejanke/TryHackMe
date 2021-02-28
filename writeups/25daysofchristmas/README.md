@@ -1217,3 +1217,364 @@ Exploring cronjob privilege escalation
     cat /home/ubuntu/flag2.txt > /tmp/f.txt
     chmod 777 /tmp/f.txt
     ```
+
+# Task 26
+
+Reverse Engineering
+
+* Use r2 to open the example binary in debug mode
+    ```
+    r2 -d ./file1
+    Process with PID 3613 started...
+    = attach 3613 3613
+    bin.baddr 0x00400000
+    Using 0x400000
+    asm.bits 64
+    [0x00400a30]>    
+    ```
+* Analyze all symbols and entry points in the program with the aa command
+    ```
+    [0x00400a30]> aa
+    [Invalid address from 0x0048449cith sym. and entry0 (aa)
+    Invalid address from 0x0044f0b6
+    [x] Analyze all flags starting with sym. and entry0 (aa)
+    ```
+* List functions with the afl command
+    ```
+    [0x00400a30]> afl
+    0x00400a30    1 42           entry0
+    0x00400e10  114 1657         sym.__libc_start_main
+    0x004004d0    1 1            sym.backtrace_and_maps.constprop.1
+    0x00411f80   14 374          sym.__libc_message.constprop.0
+    0x00418c20   12 234          sym.int_mallinfo
+    0x00418da0    1 32           sym.malloc_printerr
+    0x00418dc0   44 672  -> 650  sym.malloc_consolidate
+    0x00419060   21 420  -> 393  sym.new_heap
+    ...
+    ...
+    ...
+    ...
+    ```
+* Examine the main function with the pdf command
+    ```
+    [0x00400a30]> afl | grep main
+    0x00400e10  114 1657         sym.__libc_start_main
+    0x0048fb30   16 247  -> 237  sym._nl_unload_domain
+    0x00403b10  308 5366 -> 5301 sym._nl_load_domain
+    0x00470520    1 49           sym._IO_switch_to_main_wget_area
+    0x00403870   39 672  -> 640  sym._nl_find_domain
+    0x00400b4d    1 68           main
+    0x0048fae0    7 73   -> 69   sym._nl_finddomain_subfreeres
+    0x0044cf00    1 8            sym._dl_get_dl_main_map
+    0x00415fe0    1 43           sym._IO_switch_to_main_get_area
+    [0x00400a30]> 
+
+    [0x00400a30]> pdf @main
+                ; DATA XREF from entry0 @ 0x400a4d
+    ┌ 68: int main (int argc, char **argv, char **envp);
+    │           ; var int64_t var_ch @ rbp-0xc
+    │           ; var int64_t var_8h @ rbp-0x8
+    │           ; var int64_t var_4h @ rbp-0x4
+    │           0x00400b4d      55             push rbp
+    │           0x00400b4e      4889e5         mov rbp, rsp
+    │           0x00400b51      4883ec10       sub rsp, 0x10
+    │           0x00400b55      c745f4040000.  mov dword [var_ch], 4
+    │           0x00400b5c      c745f8050000.  mov dword [var_8h], 5
+    │           0x00400b63      8b55f4         mov edx, dword [var_ch]
+    │           0x00400b66      8b45f8         mov eax, dword [var_8h]
+    │           0x00400b69      01d0           add eax, edx
+    │           0x00400b6b      8945fc         mov dword [var_4h], eax
+    │           0x00400b6e      8b4dfc         mov ecx, dword [var_4h]
+    │           0x00400b71      8b55f8         mov edx, dword [var_8h]
+    │           0x00400b74      8b45f4         mov eax, dword [var_ch]
+    │           0x00400b77      89c6           mov esi, eax
+    │           0x00400b79      488d3d881409.  lea rdi, str.the_value_of_a_is__d__the_value_of_b_is__d_and_the_value_of_c_is__d ; 0x492008 ; "the value of a is %d, the value of b is %d and the value of c is %d"
+    │           0x00400b80      b800000000     mov eax, 0
+    │           0x00400b85      e8f6ea0000     call sym.__printf
+    │           0x00400b8a      b800000000     mov eax, 0
+    │           0x00400b8f      c9             leave
+    └           0x00400b90      c3             ret
+    ```
+
+* Set a breakpoint at the first mov command, then verify a b shows up next to your memory address
+    ```
+    [0x00400a30]> db 0x00400b55
+    [0x00400a30]> pdf @main
+                ; DATA XREF from entry0 @ 0x400a4d
+    ┌ 68: int main (int argc, char **argv, char **envp);
+    │           ; var int64_t var_ch @ rbp-0xc
+    │           ; var int64_t var_8h @ rbp-0x8
+    │           ; var int64_t var_4h @ rbp-0x4
+    │           0x00400b4d      55             push rbp
+    │           0x00400b4e      4889e5         mov rbp, rsp
+    │           0x00400b51      4883ec10       sub rsp, 0x10
+    │           0x00400b55 b    c745f4040000.  mov dword [var_ch], 4
+    │           0x00400b5c      c745f8050000.  mov dword [var_8h], 5
+    │           0x00400b63      8b55f4         mov edx, dword [var_ch]
+    │           0x00400b66      8b45f8         mov eax, dword [var_8h]
+    │           0x00400b69      01d0           add eax, edx
+    │           0x00400b6b      8945fc         mov dword [var_4h], eax
+    │           0x00400b6e      8b4dfc         mov ecx, dword [var_4h]
+    │           0x00400b71      8b55f8         mov edx, dword [var_8h]
+    │           0x00400b74      8b45f4         mov eax, dword [var_ch]
+    │           0x00400b77      89c6           mov esi, eax
+    │           0x00400b79      488d3d881409.  lea rdi, str.the_value_of_a_is__d__the_value_of_b_is__d_and_the_value_of_c_is__d ; 0x492008 ; "the value of a is %d, the value of b is %d and the value of c is %d"
+    │           0x00400b80      b800000000     mov eax, 0
+    │           0x00400b85      e8f6ea0000     call sym.__printf
+    │           0x00400b8a      b800000000     mov eax, 0
+    │           0x00400b8f      c9             leave
+    └           0x00400b90      c3             ret
+
+    ```
+* Run the program with the dc command, it will execute until the breakpoint is hit, ;-- rip shows where execution has stopped
+    ```
+    [0x00400a30]> dc
+    hit breakpoint at: 0x400b55
+    [0x00400b55]> pdf
+                ; DATA XREF from entry0 @ 0x400a4d
+                ;-- rax:
+    ┌ 68: int main (int argc, char **argv, char **envp);
+    │           ; var int64_t var_ch @ rbp-0xc
+    │           ; var int64_t var_8h @ rbp-0x8
+    │           ; var int64_t var_4h @ rbp-0x4
+    │           0x00400b4d      55             push rbp
+    │           0x00400b4e      4889e5         mov rbp, rsp
+    │           0x00400b51      4883ec10       sub rsp, 0x10
+    │           ;-- rip:
+    │           0x00400b55 b    c745f4040000.  mov dword [var_ch], 4
+    │           0x00400b5c      c745f8050000.  mov dword [var_8h], 5
+    │           0x00400b63      8b55f4         mov edx, dword [var_ch]
+    │           0x00400b66      8b45f8         mov eax, dword [var_8h]
+    │           0x00400b69      01d0           add eax, edx
+    │           0x00400b6b      8945fc         mov dword [var_4h], eax
+    │           0x00400b6e      8b4dfc         mov ecx, dword [var_4h]
+    │           0x00400b71      8b55f8         mov edx, dword [var_8h]
+    │           0x00400b74      8b45f4         mov eax, dword [var_ch]
+    │           0x00400b77      89c6           mov esi, eax
+    │           0x00400b79      488d3d881409.  lea rdi, str.the_value_of_a_is__d__the_value_of_b_is__d_and_the_value_of_c_is__d ; 0x492008 ; "the value of a is %d, the value of b is %d and the value of c is %d"
+    │           0x00400b80      b800000000     mov eax, 0
+    │           0x00400b85      e8f6ea0000     call sym.__printf
+    │           0x00400b8a      b800000000     mov eax, 0
+    │           0x00400b8f      c9             leave
+    └           0x00400b90      c3             ret
+
+    ```
+* Check the value of var_ch at memory address rbp-0xc
+    ```
+    [0x00400b55]> px @ rbp-0xc
+    - offset -       0 1  2 3  4 5  6 7  8 9  A B  C D  E F  0123456789ABCDEF
+    0x7fffb689b584  0000 0000 1890 6b00 0000 0000 7018 4000  ......k.....p.@.
+    0x7fffb689b594  0000 0000 1911 4000 0000 0000 0000 0000  ......@.........
+    0x7fffb689b5a4  0000 0000 0000 0000 0100 0000 b8b6 89b6  ................
+    0x7fffb689b5b4  ff7f 0000 4d0b 4000 0000 0000 0000 0000  ....M.@.........
+    0x7fffb689b5c4  0000 0000 0600 0000 5e00 0000 5000 0000  ........^...P...
+    0x7fffb689b5d4  0300 0000 0000 0000 0000 0000 0000 0000  ................
+    0x7fffb689b5e4  0000 0000 0000 0000 0000 0000 0000 0000  ................
+    0x7fffb689b5f4  0000 0000 0000 0000 0000 0000 0004 4000  ..............@.
+    0x7fffb689b604  0000 0000 83db 3379 3be6 4d9f 1019 4000  ......3y;.M...@.
+    0x7fffb689b614  0000 0000 0000 0000 0000 0000 1890 6b00  ..............k.
+    0x7fffb689b624  0000 0000 0000 0000 0000 0000 83db 9322  ..............."
+    0x7fffb689b634  a88b b260 83db 4768 3be6 4d9f 0000 0000  ...`..Gh;.M.....
+    0x7fffb689b644  0000 0000 0000 0000 0000 0000 0000 0000  ................
+    0x7fffb689b654  0000 0000 0000 0000 0000 0000 0000 0000  ................
+    0x7fffb689b664  0000 0000 0000 0000 0000 0000 0000 0000  ................
+    0x7fffb689b674  0000 0000 0000 0000 0000 0000 0000 0000  ................
+    ```
+* Use ds to advance one instruction at a time
+    ```
+    [0x00400b55]> ds
+    [+] SIGNAL 28 errno=0 addr=0x00000000 code=128 si_pid=0 ret=0
+    hit breakpoint at: 0x400b55
+    [0x00400b55]> px @ rbp-0xc
+    - offset -       0 1  2 3  4 5  6 7  8 9  A B  C D  E F  0123456789ABCDEF
+    0x7fffb689b584  0000 0000 1890 6b00 0000 0000 7018 4000  ......k.....p.@.
+    0x7fffb689b594  0000 0000 1911 4000 0000 0000 0000 0000  ......@.........
+    0x7fffb689b5a4  0000 0000 0000 0000 0100 0000 b8b6 89b6  ................
+    0x7fffb689b5b4  ff7f 0000 4d0b 4000 0000 0000 0000 0000  ....M.@.........
+    0x7fffb689b5c4  0000 0000 0600 0000 5e00 0000 5000 0000  ........^...P...
+    0x7fffb689b5d4  0300 0000 0000 0000 0000 0000 0000 0000  ................
+    0x7fffb689b5e4  0000 0000 0000 0000 0000 0000 0000 0000  ................
+    0x7fffb689b5f4  0000 0000 0000 0000 0000 0000 0004 4000  ..............@.
+    0x7fffb689b604  0000 0000 83db 3379 3be6 4d9f 1019 4000  ......3y;.M...@.
+    0x7fffb689b614  0000 0000 0000 0000 0000 0000 1890 6b00  ..............k.
+    0x7fffb689b624  0000 0000 0000 0000 0000 0000 83db 9322  ..............."
+    0x7fffb689b634  a88b b260 83db 4768 3be6 4d9f 0000 0000  ...`..Gh;.M.....
+    0x7fffb689b644  0000 0000 0000 0000 0000 0000 0000 0000  ................
+    0x7fffb689b654  0000 0000 0000 0000 0000 0000 0000 0000  ................
+    0x7fffb689b664  0000 0000 0000 0000 0000 0000 0000 0000  ................
+    0x7fffb689b674  0000 0000 0000 0000 0000 0000 0000 0000  ................
+
+    [0x00400b55]> ds
+    [0x00400b55]> px @ rbp-0xc
+    - offset -       0 1  2 3  4 5  6 7  8 9  A B  C D  E F  0123456789ABCDEF
+    0x7fffb689b584  0400 0000 1890 6b00 0000 0000 7018 4000  ......k.....p.@.
+    0x7fffb689b594  0000 0000 1911 4000 0000 0000 0000 0000  ......@.........
+    0x7fffb689b5a4  0000 0000 0000 0000 0100 0000 b8b6 89b6  ................
+    0x7fffb689b5b4  ff7f 0000 4d0b 4000 0000 0000 0000 0000  ....M.@.........
+    0x7fffb689b5c4  0000 0000 0600 0000 5e00 0000 5000 0000  ........^...P...
+    0x7fffb689b5d4  0300 0000 0000 0000 0000 0000 0000 0000  ................
+    0x7fffb689b5e4  0000 0000 0000 0000 0000 0000 0000 0000  ................
+    0x7fffb689b5f4  0000 0000 0000 0000 0000 0000 0004 4000  ..............@.
+    0x7fffb689b604  0000 0000 83db 3379 3be6 4d9f 1019 4000  ......3y;.M...@.
+    0x7fffb689b614  0000 0000 0000 0000 0000 0000 1890 6b00  ..............k.
+    0x7fffb689b624  0000 0000 0000 0000 0000 0000 83db 9322  ..............."
+    0x7fffb689b634  a88b b260 83db 4768 3be6 4d9f 0000 0000  ...`..Gh;.M.....
+    0x7fffb689b644  0000 0000 0000 0000 0000 0000 0000 0000  ................
+    0x7fffb689b654  0000 0000 0000 0000 0000 0000 0000 0000  ................
+    0x7fffb689b664  0000 0000 0000 0000 0000 0000 0000 0000  ................
+    0x7fffb689b674  0000 0000 0000 0000 0000 0000 0000 0000  ................
+    ```
+* Use ds to advance and dr to view the register
+    ```
+    [0x00400b55]> ds
+    [0x00400b55]> dr
+    rax = 0x00400b4d
+    rbx = 0x00400400
+    rcx = 0x0044ba90
+    rdx = 0x7fffb689b6c8
+    r8 = 0x00000000
+    r9 = 0x00000000
+    r10 = 0x00000004
+    r11 = 0x00000001
+    r12 = 0x00401910
+    r13 = 0x00000000
+    r14 = 0x006b9018
+    r15 = 0x00000000
+    rsi = 0x7fffb689b6b8
+    rdi = 0x00000001
+    rsp = 0x7fffb689b580
+    rbp = 0x7fffb689b590
+    rip = 0x00400b63
+    rflags = 0x00000202
+    orax = 0xffffffffffffffff
+    ```
+
+# Task 27
+
+Reverse Engineering
+
+* Extract challenge files from zip
+* Change challenge file to executable
+* Launch r2 in debug mode and start analysis
+    ```
+    chmod +x if2
+
+    r2 -d ./if2
+
+    Process with PID 3944 started...
+    = attach 3944 3944
+    bin.baddr 0x00400000
+    Using 0x400000
+    asm.bits 64
+
+    [0x00400a30]> aa
+    [Invalid address from 0x004843bcith sym. and entry0 (aa)
+    Invalid address from 0x0044efd6
+    [x] Analyze all flags starting with sym. and entry0 (aa)
+    [0x00400a30]> 
+    ```
+* Look for main
+    ```
+    [0x00400a30]> afl | grep main
+    0x00400df0  114 1657         sym.__libc_start_main
+    0x0048fa50   16 247  -> 237  sym._nl_unload_domain
+    0x00403af0  308 5366 -> 5301 sym._nl_load_domain
+    0x00470440    1 49           sym._IO_switch_to_main_wget_area
+    0x00403850   39 672  -> 640  sym._nl_find_domain
+    0x00400b4d    4 43           main
+    0x0048fa00    7 73   -> 69   sym._nl_finddomain_subfreeres
+    0x0044ce20    1 8            sym._dl_get_dl_main_map
+    0x00415f00    1 43           sym._IO_switch_to_main_get_area
+    [0x00400a30]> pdf @main
+                ; DATA XREF from entry0 @ 0x400a4d
+    ┌ 43: int main (int argc, char **argv, char **envp);
+    │           ; var int64_t var_8h @ rbp-0x8
+    │           ; var int64_t var_4h @ rbp-0x4
+    │           0x00400b4d      55             push rbp
+    │           0x00400b4e      4889e5         mov rbp, rsp
+    │           0x00400b51      c745f8080000.  mov dword [var_8h], 8
+    │           0x00400b58      c745fc020000.  mov dword [var_4h], 2
+    │           0x00400b5f      8b45f8         mov eax, dword [var_8h]
+    │           0x00400b62      3b45fc         cmp eax, dword [var_4h]
+    │       ┌─< 0x00400b65      7e06           jle 0x400b6d
+    │       │   0x00400b67      8345f801       add dword [var_8h], 1
+    │      ┌──< 0x00400b6b      eb04           jmp 0x400b71
+    │      │└─> 0x00400b6d      8345fc07       add dword [var_4h], 7
+    │      │    ; CODE XREF from main @ 0x400b6b
+    │      └──> 0x00400b71      b800000000     mov eax, 0
+    │           0x00400b76      5d             pop rbp
+    └           0x00400b77      c3             ret
+    ```
+* Set breakpoint for the first push, execute the program, verify breakpoint
+    ```
+    [0x00400a30]> db 0x00400b4d
+
+    [0x00400a30]> dc
+    hit breakpoint at: 0x400b4d
+
+    [0x00400b4d]> pdf @main
+                ; DATA XREF from entry0 @ 0x400a4d
+                ;-- rax:
+                ;-- rip:
+    ┌ 43: int main (int argc, char **argv, char **envp);
+    │           ; var int64_t var_8h @ rbp-0x8
+    │           ; var int64_t var_4h @ rbp-0x4
+    │           0x00400b4d b    55             push rbp
+    │           0x00400b4e      4889e5         mov rbp, rsp
+    │           0x00400b51      c745f8080000.  mov dword [var_8h], 8
+    │           0x00400b58      c745fc020000.  mov dword [var_4h], 2
+    │           0x00400b5f      8b45f8         mov eax, dword [var_8h]
+    │           0x00400b62      3b45fc         cmp eax, dword [var_4h]
+    │       ┌─< 0x00400b65      7e06           jle 0x400b6d
+    │       │   0x00400b67      8345f801       add dword [var_8h], 1
+    │      ┌──< 0x00400b6b      eb04           jmp 0x400b71
+    │      │└─> 0x00400b6d      8345fc07       add dword [var_4h], 7
+    │      │    ; CODE XREF from main @ 0x400b6b
+    │      └──> 0x00400b71      b800000000     mov eax, 0
+    │           0x00400b76      5d             pop rbp
+    └           0x00400b77      c3             ret
+    ```
+* Advance through and check values for 4h and 8h
+    ```
+    [0x00400b4d]> ds
+
+    [0x00400b4d]> px @ rbp-0x8
+    - offset -   0 1  2 3  4 5  6 7  8 9  A B  C D  E F  0123456789ABCDEF
+    0x00401848  1f84 0000 0000 0090 4157 4c8d 3de7 482b  ........AWL.=.H+
+    0x00401858  0041 564c 8d35 de48 2b00 4155 4154 5553  .AVL.5.H+.AUATUS
+    0x00401868  89fd 4d29 fe49 89f4 4989 d549 c1fe 0348  ..M).I..I..I...H
+    0x00401878  83ec 084d 85f6 741d 31db 660f 1f44 0000  ...M..t.1.f..D..
+    0x00401888  4c89 ea4c 89e6 89ef 41ff 14df 4883 c301  L..L....A...H...
+    0x00401898  4939 de75 eb4c 8d3d 9c48 2b00 4c8d 35a5  I9.u.L.=.H+.L.5.
+    0x004018a8  482b 00e8 50eb ffff 4d29 fe49 c1fe 034d  H+..P...M).I...M
+    0x004018b8  85f6 7419 31db 6690 4c89 ea4c 89e6 89ef  ..t.1.f.L..L....
+    0x004018c8  41ff 14df 4883 c301 4939 de75 eb48 83c4  A...H...I9.u.H..
+    0x004018d8  085b 5d41 5c41 5d41 5e41 5fc3 6690 662e  .[]A\A]A^A_.f.f.
+    0x004018e8  0f1f 8400 0000 0000 5548 8d05 6848 2b00  ........UH..hH+.
+    0x004018f8  488d 2d51 482b 0053 4829 e848 c1f8 0348  H.-QH+.SH).H...H
+    0x00401908  83ec 0848 85c0 7416 488d 58ff 0f1f 4000  ...H..t.H.X...@.
+    0x00401918  ff54 dd00 4883 eb01 4883 fbff 75f2 4883  .T..H...H...u.H.
+    0x00401928  c408 5b5d e9cf 0509 0066 2e0f 1f84 0000  ..[].....f......
+    0x00401938  0000 000f 1f44 0000 4156 4155 4189 ce41  .....D..AVAUA..A
+
+    [0x00400b4d]> pdf @main
+                ; DATA XREF from entry0 @ 0x400a4d
+    ┌ 43: int main (int argc, char **argv, char **envp);
+    │           ; var int64_t var_8h @ rbp-0x8
+    │           ; var int64_t var_4h @ rbp-0x4
+    │           0x00400b4d b    55             push rbp
+    │           0x00400b4e      4889e5         mov rbp, rsp
+    │           0x00400b51      c745f8080000.  mov dword [var_8h], 8
+    │           0x00400b58      c745fc020000.  mov dword [var_4h], 2
+    │           0x00400b5f      8b45f8         mov eax, dword [var_8h]
+    │           ;-- rip:
+    │           0x00400b62      3b45fc         cmp eax, dword [var_4h]
+    │       ┌─< 0x00400b65      7e06           jle 0x400b6d
+    │       │   0x00400b67      8345f801       add dword [var_8h], 1
+    │      ┌──< 0x00400b6b      eb04           jmp 0x400b71
+    │      │└─> 0x00400b6d      8345fc07       add dword [var_4h], 7
+    │      │    ; CODE XREF from main @ 0x400b6b
+    │      └──> 0x00400b71      b800000000     mov eax, 0
+    │           0x00400b76      5d             pop rbp
+    └           0x00400b77      c3             ret
+    ```
