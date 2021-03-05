@@ -160,3 +160,12 @@ Creation of yara rules from strings found in malware files while removing all be
   * https://www.nextron-systems.com/2016/04/15/how-to-write-simple-but-sound-yara-rules-part-3/
 
 # Task 11 - Valhalla
+Valhalla
+
+https://www.nextron-systems.com/valhalla/
+
+Online search
+
+https://valhalla.nextron-systems.com/
+
+# Task 12 - Conclusion
