@@ -112,3 +112,123 @@ https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.diagnost
     ...
     ...
     ```
+
+# Task 5 - XPath Queries
+XPath - XML Path Language.  Windows Event Log supports a subset of XPath 1.0
+
+Docs
+* https://docs.microsoft.com/en-us/windows/win32/wes/consuming-events#xpath-10-limitations
+
+XPath example using Get-WinEvent (the filter is case sensitive)
+```
+PS C:\Users\Administrator> Get-WinEvent -logname application -filterxpath '*/System/EventID=100'
+
+
+ProviderName: WLMS
+
+TimeCreated                     Id LevelDisplayName Message
+-----------                     -- ---------------- -------
+12/21/2020 4:23:47 AM          100
+12/18/2020 3:18:57 PM          100
+12/15/2020 8:50:22 AM          100
+12/15/2020 8:18:34 AM          100
+12/15/2020 7:48:34 AM          100
+12/14/2020 6:42:18 PM          100
+12/14/2020 6:12:18 PM          100
+12/14/2020 5:39:08 PM          100
+12/14/2020 5:09:08 PM          100    
+```
+XPath example using wevtutil.exe (the filter is case sensitive)
+
+```
+PS C:\Users\Administrator> wevtutil.exe qe application /q:*/System[EventID=100] /f:text /c:1
+Event[0]:
+Log Name: Application
+Source: WLMS
+Date: 2020-12-14T17:09:08.940
+Event ID: 100
+Task: None
+Level: Information
+Opcode: Info
+Keyword: Classic
+User: N/A
+User Name: N/A
+Computer: WIN-1O0UJBNP9G7
+Description:
+N/A
+```
+
+To filter on a provider use the Name attribute
+```
+PS C:\Users\Administrator> Get-WinEvent -logname application -filterxpath '*/System/Provider[@Name="WLMS"]'
+
+
+   ProviderName: WLMS
+
+TimeCreated                     Id LevelDisplayName Message
+-----------                     -- ---------------- -------
+12/21/2020 4:23:47 AM          100
+12/18/2020 3:18:57 PM          100
+12/15/2020 8:50:22 AM          100
+12/15/2020 8:48:34 AM          101
+12/15/2020 8:18:34 AM          100
+12/15/2020 7:48:34 AM          100
+12/14/2020 7:12:18 PM          101
+12/14/2020 6:42:18 PM          100
+12/14/2020 6:12:18 PM          100
+12/14/2020 6:09:09 PM          101
+12/14/2020 5:39:08 PM          100
+12/14/2020 5:09:08 PM          100
+```
+
+Two queries together
+```
+PS C:\Users\Administrator> Get-WinEvent -logname application -filterxpath '*/System/EventID=101 and */System/Provider[@Name="WLMS"]'
+
+
+   ProviderName: WLMS
+
+TimeCreated                     Id LevelDisplayName Message
+-----------                     -- ---------------- -------
+12/15/2020 8:48:34 AM          101
+12/14/2020 7:12:18 PM          101
+12/14/2020 6:09:09 PM          101
+```
+
+Getting EventData
+```
+PS C:\Users\Administrator> Get-WinEvent -logname security -filterxpath '*/EventData/Data[@Name="TargetUserName"]="System"' -maxevents 1
+
+
+   ProviderName: Microsoft-Windows-Security-Auditing
+
+TimeCreated                     Id LevelDisplayName Message
+-----------                     -- ---------------- -------
+3/7/2021 3:31:49 PM           4624 Information      An account was successfully logged on....
+```
+Filtering for a specific time
+```
+PS C:\Users\Administrator> Get-WinEvent -logname application -filterxpath '*/System/Provider[@Name="WLMS"] and */System/TimeCreated[@SystemTime="2020-12-15T01:09:08.940277500Z"]'
+
+
+   ProviderName: WLMS
+
+TimeCreated                     Id LevelDisplayName Message
+-----------                     -- ---------------- -------
+12/14/2020 5:09:08 PM          100
+```
+Filtering for user and event id
+```
+PS C:\Users\Administrator> Get-WinEvent -logname security -filterxpath '*/EventData/Data[@Name="TargetUserName"]="Sam" and */System/EventID=4724'
+
+
+   ProviderName: Microsoft-Windows-Security-Auditing
+
+TimeCreated                     Id LevelDisplayName Message
+-----------                     -- ---------------- -------
+12/17/2020 1:57:14 PM         4724 Information      An attempt was made to reset an account's password..
+```
+
+Further docs
+* https://docs.microsoft.com/en-us/previous-versions/dotnet/netframework-4.0/ms256115(v=vs.100)
+
