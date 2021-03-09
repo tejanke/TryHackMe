@@ -232,3 +232,40 @@ TimeCreated                     Id LevelDisplayName Message
 Further docs
 * https://docs.microsoft.com/en-us/previous-versions/dotnet/netframework-4.0/ms256115(v=vs.100)
 
+# Task 6 - Event IDs
+Resources
+* Windows Logging Cheat Sheet
+  * https://static1.squarespace.com/static/552092d5e4b0661088167e5c/t/580595db9f745688bc7477f6/1476761074992/Windows+Logging+Cheat+Sheet_ver_Oct_2016.pdf
+* Spotting the Adversary with Windows Event Log Monitoring
+  * https://apps.nsa.gov/iaarchive/library/reports/spotting-the-adversary-with-windows-event-log-monitoring.cfm
+* MITRE ATT&CK
+  * https://attack.mitre.org/
+* Events to Monitor
+  * https://docs.microsoft.com/en-us/windows-server/identity/ad-ds/plan/appendix-l--events-to-monitor
+* Windows 10 and Windows Server 2016 Security Auditing and Monitoring Reference
+  * https://www.microsoft.com/en-us/download/confirmation.aspx?id=52630
+* Logging Windows
+  * https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_logging_windows?view=powershell-7.1
+* Greater Visibility Through PowerShell Logging
+  * https://www.fireeye.com/blog/threat-research/2016/02/greater_visibilityt.html
+* Configure PowerShell logging to see PowerShell anomalies in Splunk
+  * https://docs.splunk.com/Documentation/UBA/5.0.4/GetDataIn/AddPowerShell
+* Search the event log with PowerShell
+  * https://4sysops.com/archives/search-the-event-log-with-the-get-winevent-powershell-cmdlet/
+
+# Task 7 - Practice
+
+* Searching events from an offline event file
+   ```
+   Get-WinEvent -filterhashtable @{path="merged.evtx"; id=400; }
+   ```
+* Searching for a keyword in the event message
+   ```
+   Get-WinEvent -filterhashtable @{path="merged.evtx"} | where-object -property Message -Match 'net1.exe' | format-list
+   ```
+
+# Task 8 - Conclusion
+Reading Material
+* https://github.com/sbousseaden/EVTX-ATTACK-SAMPLES
+* https://devblogs.microsoft.com/powershell/powershell-the-blue-team/
+* https://medium.com/palantir/tampering-with-windows-event-tracing-background-offense-and-defense-4be7ac62ac63
