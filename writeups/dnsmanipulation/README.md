@@ -1,5 +1,5 @@
 # Room
-https://tryhackme.com/room/django
+https://tryhackme.com/room/dnsmanipulation
 
 # Task 1 - Intro
 Examine DNS exfiltration and infiltration
