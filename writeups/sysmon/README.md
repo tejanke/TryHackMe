@@ -34,3 +34,16 @@ https://github.com/SwiftOnSecurity/sysmon-config
 
 https://github.com/ion-storm/sysmon-config/blob/develop/sysmonconfig-export.xml
 
+# Task 4 - Practice
+The Sysmon configuration file is very important
+
+Sysmon Best Practices
+* Prioritize excluding events rather than including them, this prevents you from missing something crucial
+* Remember CLI access using Get-WinEvent and wevutil.exe
+* Know the environment before implementation
+
+Practice with Get-WinEvent
+* Count number of events with an ID of 3
+    ```
+    Get-WinEvent -path .\Filtering.evtx -filterxpath '*/System/EventID=3' | Measure-Object
+    ```
