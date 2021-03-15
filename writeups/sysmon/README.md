@@ -47,3 +47,73 @@ Practice with Get-WinEvent
     ```
     Get-WinEvent -path .\Filtering.evtx -filterxpath '*/System/EventID=3' | Measure-Object
     ```
+
+# Task 5 - Hunting Metasploit
+Metasploit is a commonly used exploit framework for penetration testing and red team ops
+
+```
+get-winevent -path .\HuntingMetasploit.evtx -filterxpath '*/System/EventID=3 and */EventData/Data[@Name="DestinationPort"] and */EventData/Data=444'
+
+
+   ProviderName: Microsoft-Windows-Sysmon
+
+TimeCreated                      Id LevelDisplayName Message
+-----------                      -- ---------------- -------
+1/4/2021 9:21:32 PM               3
+```
+
+# Task 6 - Detecting Mimikatz
+Mimikatz is a well known credential dumping tool used mainly for getting information from LSASS
+
+```
+get-winevent -path .\HuntingMimikatz.evtx -filterxpath '*/System/EventID=10 and */EventData/Data[@Name="TargetImage"] and */EventData/Data="C:\Windows\system32\lsass.exe"'
+
+
+   ProviderName: Microsoft-Windows-Sysmon
+
+TimeCreated                      Id LevelDisplayName Message
+-----------                      -- ---------------- -------
+1/4/2021 10:22:52 PM             10
+```
+
+# Task 7 - Hunting Malware
+Two popular forms of malware are RATs and backdoors.  RATs are remote access trojans used to gain remote access, examples are Xeexe and Quasar.  
+
+```
+get-winevent -path .\HuntingRats.evtx -filterxpath '*/System/EventID=3 and */EventData/Data[@Name="DestinationPort"] and */EventData/Data=8080'
+
+
+   ProviderName: Microsoft-Windows-Sysmon
+
+TimeCreated                      Id LevelDisplayName Message
+-----------                      -- ---------------- -------
+1/4/2021 11:44:35 PM              3
+```
+
+# Task 8 - Hunting Persistence
+Persistence is used by attackers to maintain access after compromise
+
+# Task 9 - Detecting Evasion Techniques
+Malware authors use evasion techniques to remain undetected from anti-virus
+
+Resources
+* https://attack.mitre.org/techniques/T1564/004/
+* https://attack.mitre.org/techniques/T1055/
+
+# Task 10 - Practical
+* Searching for processes and registry keys
+    ```
+    get-winevent -filterhashtable @{path=".\Investigation-1.evtx"; id=13;} | select-object -expandproperty properties | where-object {($_.value -match "svc") -or ($_.value -match "HKLM\\System")}
+    ```
+* Searching for access devices
+    ```
+    get-winevent -filterhashtable @{path=".\Investigation-1.evtx";} | select-object -expandproperty properties | where-object {($_.value -match "device\\")}
+    ```
+* Searching for executables
+    ```
+    get-winevent -filterhashtable @{path=".\Investigation-1.evtx";} | select-object -expandproperty properties | where-object {($_.value -match "exe")}
+    ```
+* Basic searching for IPs
+    ```
+    get-winevent -filterhashtable @{path=".\Investigation-2.evtx";} | select-object -expandproperty properties | where-object {($_.value -match "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}")}
+    ```
