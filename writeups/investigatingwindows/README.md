@@ -8,7 +8,7 @@ https://tryhackme.com/room/investigatingwindows
     ```
 * Find the last logged in user
     ```
-    PS C:\Users\Administrator> get-winevent -filterhashtable @{logname='Security'; id=4648} | sort | select -first 1 | fl | findstr /c:"Account Name:"    
+    get-winevent -filterhashtable @{logname='Security'; id=4648} | sort | select -first 1 | fl | findstr /c:"Account Name:"    
     ```
 * Check user logins
     ```
@@ -20,3 +20,23 @@ https://tryhackme.com/room/investigatingwindows
     ```
 * Check Windows startup in the registry
   * https://lazyadmin.nl/it/windows-10-startup-folder-location/
+
+* List users in the Administrators group
+    ```
+    get-localgroupmember -Group "Administrators"
+    ```
+
+* List custom scheduled tasks
+    ```
+    get-scheduledtask | where-object {$_.taskpath -eq "\"}
+    ```
+
+* Grab information on a scheduled task
+    ```
+    schtasks /query /tn "clean file system" /xml    
+    ```
+
+* Check for last login
+    ```
+    get-eventlog -logname security -instanceid 4624 | ?{$_.message -match "Jenny"}
+    ```
