@@ -40,3 +40,10 @@ https://tryhackme.com/room/investigatingwindows
     ```
     get-eventlog -logname security -instanceid 4624 | ?{$_.message -match "Jenny"}
     ```
+
+* Parse through all logs
+    ```
+    get-winevent -listlog * | foreach-object { if ($_.RecordCount -gt 0) { write-host $_.LogName; get-winevent $_.LogName | foreach-object { if ($_.Message -match "Jenny") { write-host $_.Message } }}}
+
+    get-winevent -listlog * | foreach-object { if ($_.RecordCount -gt 0) { write-host $_.LogName; get-winevent $_.LogName | foreach-object { if ($_.Message -match "[0-9][0-9]\.[0-9][0-9]\.[0-9][0-9]\.") { write-host $_.Message } }}}
+    ```
