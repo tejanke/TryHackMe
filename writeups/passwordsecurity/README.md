@@ -23,3 +23,38 @@ Storage
 * Hashed - hashing, or better salted hashing is the preferred method of storage
 
 Hashes for the same password with different users are the same, salted hashes for the same password with different users are different
+
+# Task 6 - Different Hashes and Cracking Speeds
+A key derivation function is a method to generate secrets from a given secret.  They include:
+* Key separation - derive multiple independent passwords from a master password
+* Key stretching - create a longer password using a shorter one
+* Key whitening - key with fixed random bits
+
+Key stretching algorithms:
+* PBKDF2 - Pasword-Based Key Derivation Function 2
+  * pros : iterations can be adjusted
+  * cons : fast hashing, uses little memory, low protection against hardware attacks
+
+* bcrypt
+  * pros : cost factor that adapts with computing power, uses an expensive function
+  * cons : uses little memory, medium protection against hardware attacks
+
+* scrypt
+  * pros : cost factor for time and memory, based on PBKDF2
+  * cons : cost factor bound to one parameter, too new
+
+* argon2
+  * pros : memory and time cost controlled separately, multiple versions, winner of hashing competition
+  * cons : newer than scrypt
+
+Crypto ripens with age
+
+# Task 7 - Advice
+Advice from Bruce Schneier:
+* Never reuse a password you care about
+* Don't bother updating your password unless it has been compromised
+* Beware of secret questions
+* If 2FA is available, use it
+
+# Task 8 - Conclusion
+Fin
