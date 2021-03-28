@@ -40,3 +40,12 @@ Signature types
   * Searching for shares
   * Call home
 
+# Task 4 - Static vs Dynamic Analysis
+Two categories of Malware Analysis
+* Static
+  * gain a high level abstraction of the sample
+  * signature analysis
+  * checksums
+* Dynamic
+  * executing the sample and observing what happens
+
