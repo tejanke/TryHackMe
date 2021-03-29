@@ -49,3 +49,30 @@ Two categories of Malware Analysis
 * Dynamic
   * executing the sample and observing what happens
 
+# Task 5 - Tools
+Static Analysis
+* Dependency Walker - depends
+* PeID
+* PE Explorer
+* PEview
+* ResourceHacker
+* IDA Freeware
+* WinDbg
+
+# Task 6 - Analysis environment
+Connect via RDP
+
+# Task 7 - MD5 checksums
+Reviewing MD5 hashes in Windows using the hashtab application
+
+http://implbits.com/products/hashtab/
+
+# Task 8 - Check MD5 hashes
+Use the MD5 hashes of the applications found in the task and look them up in Virustotal to see if they are malicious
+
+https://www.virustotal.com/gui/home/search
+
+# Task 9 - Check if an exe is obfuscated / packed
+PeID is a great tool for checking the compiler / packer of a file.  The hex value for an executable is always "4D 5A"
+
+Use PeID to discover the compiler for a few task files
