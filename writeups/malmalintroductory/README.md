@@ -76,3 +76,28 @@ https://www.virustotal.com/gui/home/search
 PeID is a great tool for checking the compiler / packer of a file.  The hex value for an executable is always "4D 5A"
 
 Use PeID to discover the compiler for a few task files
+
+# Task 10 - Obfuscation / Packing
+Packing is a form of obfuscation that is used to prevent analysis of programs
+
+Use PeID to discover the packer for a task file
+
+# Task 11 - Packed & Non-Packed Code
+PeID can automatically detect a lot of packers, but it cannot de-obfuscate them
+
+Open IDA pointing to example packed file
+
+# Task 12 - Intro to Strings
+Strings are the ASCII/Text contents of a program, for example, passwords, addresses, etc
+
+strings --accepteula [filename]
+
+Use strings and PE Explorer to examine task files
+
+# Task 13 - Intro to Imports
+Disassemblers reverse compiled code from machine code to human-readable instructions (assembly).  Debuggers use the same techniques as disassemblers but facilitate analysis and stepping through an application's execution
+
+Use IDA to examine a task file
+
+# Task 14 - Practical
+Use MD5 hash, Virustotal, strings, and PeID on a task file
