@@ -27,3 +27,14 @@ There are two kinds of audit methods:
   * using the Internet to get audit objectives
   * only used for first or second party audits
 
+# Task 3 - ISMS
+Topics
+* People / Employees
+  * Members of the organization should participate in and take the ISMS seriously
+* Technology  
+  * An organizations use of technology should also encompass ISMS
+* Legislation
+  * Always consider relevant law
+* Organization
+  * The politices, process, and plans that make up the body
+
