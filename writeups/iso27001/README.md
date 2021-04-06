@@ -38,3 +38,21 @@ Topics
 * Organization
   * The politices, process, and plans that make up the body
 
+# Task 4 - Requirements
+Requirements
+* Internal
+  * The employees, managers, owners, and contractors
+* External
+  * Things such as suppliers, creditors, distributors, and insurers
+* Leadership
+  * Leaders cement commitment to the system and create the plan
+* Planning
+  * Creating, quantifying, and qualifying a plan
+* Support
+  * Resources available to an organization
+* Operation
+  * Documentation and risk
+* Performance Evaluation
+  * Understand the performance objective with audits
+* Improvement
+  * Ways to enhance your approach and response to the system
