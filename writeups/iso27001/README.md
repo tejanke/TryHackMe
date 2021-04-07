@@ -56,3 +56,6 @@ Requirements
   * Understand the performance objective with audits
 * Improvement
   * Ways to enhance your approach and response to the system
+
+# Task 5 - Controls and domains
+Control objectives and controls.  Clauses, categorys, and controls consisting of 18 domains where the first 4 are not auditable
