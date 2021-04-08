@@ -59,3 +59,5 @@ Requirements
 
 # Task 5 - Controls and domains
 Control objectives and controls.  Clauses, categorys, and controls consisting of 18 domains where the first 4 are not auditable
+
+# Task 6 - Conclusion
