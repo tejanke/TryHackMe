@@ -22,3 +22,19 @@ Sandboxing is a technique used to isolate processes and prevent direct interacti
 
 Complete a task by reviewing analysis from any.run for Emotet
 
+# Task 5 - Practical
+Practical using hashtab, get-filehash, and certutil.exe
+
+```
+get-filehash [filename] -algorithm [algorithm]
+```
+
+```
+certutil -hashfile [filename] [algorithm]
+```
+
+# Task 6 - VirusTotal
+Practical using VirusTotal to review a report
+
+# Task 7 - Conclusion
+Fin
