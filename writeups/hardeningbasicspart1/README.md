@@ -105,3 +105,47 @@ iptables chain actions
 * FORWARD - packets sent to another NIC or network
 * OUTPUT - packets outbound
 
+# Task 14 - iptables configuration
+Security rules are commonly referred to as ACLs, they are read and applied in order, top down
+
+Basic command walkthrough
+```
+sudo iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELEATED -j ACCEPT
+
+* -A INPUT - append to the INPUT chain
+* -m conntrack - call the conntrack module to keep track of connections
+* --ctstate ESTABLISHED,RELATED - keeps track of connections that are already ESTABLISHED and connections RELATED to the already ESTABLISHED connections
+* -j ACCEPT - the j stands for jump, and the packet will be accepted, stop processing other rules
+```
+
+Port command walkthrough
+```
+sudo iptables -A INPUT -p tcp --dport ssh -j ACCEPT
+
+* -p {protocol} - which protocol to use
+* --dport - controls the destination port
+```
+
+Block command walkthrough
+```
+sudo iptables -A INPUT -p tcp --dport smb -j DROP
+
+* j DROP - the packet will be dropped, stop processing other rules
+```
+
+Saving configuration
+```
+sudo iptables-save
+```
+
+# Task 15 - ufw and a quiz
+By default ufw is disabled
+
+ufw commands
+* sudo ufw status - check firewall status
+* sudo ufw enable - enable the firewall
+* sudo ufw disable - disable the firewall
+* sudo ufw allow 9000/tcp - allow TCP port 9000
+* sudo ufw deny 23/tcp - block TCP port 23
+
+Answer quiz questions and fin
