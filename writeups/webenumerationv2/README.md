@@ -71,3 +71,61 @@ The best 3rd party wordlists come from Daniel Miessler
 # Task 6 - Gobuster Practical
 Practical with Gobuster
 
+# Task 7 - Intro to WPScan
+WPScan is a framework that allows you to enumerate security vulnerabilities in WordPress, some of those include:
+* Sensitive Information Disclosure
+* Path Discovery
+* Weak Password Policies
+* Presence of Default Installation
+* Testing of WAF
+
+Installing WPScan
+```
+sudo apt update && sudo apt install wpscan
+```
+
+Updating the WPScan database
+```
+wpscan --update
+```
+
+# Task 8 - WPScan modes
+WPScan can usually detect the theme that is running
+
+```
+wpscan --url http://site --enumerate t
+```
+
+WPScan can also enumerate the plugins that are installed
+
+```
+wpscan --url http://site --enumerate p
+```
+
+WPScan can enumerate users
+
+```
+wpscan --url http://site --enumerate u
+```
+
+WPScan detecting vulnerabilities
+
+```
+wpscan --url http://site --enumerate vp
+```
+
+WPScan and password attacks
+
+```
+wpscan --url http://site -passwords rockyou.txt -usernames user
+```
+
+WPScan flags
+* --plugins-detection aggressive - the default is passive
+* --enumerate p - plugins
+* --enumerate t - themes
+* --enumerate u - usernames
+* --enumerate v - cross reference vulnerabilities
+
+# Task 9 - WPScan Practical
+Answer questions based on using WPScan against the challenge target
