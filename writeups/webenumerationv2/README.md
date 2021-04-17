@@ -129,3 +129,54 @@ WPScan flags
 
 # Task 9 - WPScan Practical
 Answer questions based on using WPScan against the challenge target
+
+# Task 10 - Intro to Nikto
+Nikto is a popular vulnerability scanner that can discover:
+* sensitive files
+* outdated servers and programs
+* common misconfigurations
+
+Installing nikto
+```
+sudo apt update && sudo apt install nikto
+```
+
+# Task 11 - Nikto Modes
+Basic scanning
+* nikto -h [ip]
+  * retrieves headers and looks for sensitive files
+
+Multiple hosts and ports
+* nikto -h [ip] -p 80,81,82
+* nmap -p80 192.168.1.0/24 -oG - | nikto -h -
+
+Plugins
+* nikto --list-plugins
+* useful plugins
+  * apacheusers - enumerate apache HTTP auth users
+  * cgi - look for cgi scripts
+  * robots - analyze robots.txt and enumerate
+  * dir_traversal - directory traversal attack
+* nikto -h [ip] -Plugin apacheuser
+
+Verbosity
+* -Display 1 - show redirects
+* -Display 2 - show cookies
+* -Display E - show errors
+
+Vulnerability Searching
+* -Tuning 0 - file uploads
+* -Tuning 2 - misconfigurations
+* -Tuning 3 - information disclosure
+* -Tuning 4 - injection
+* -Tuning 8 - command execution
+* -Tuning 9 - SQL injection
+
+Saving Output
+* nikto -h [ip] -o report.html
+
+# Task 12 - Nikto Practical
+Use nikto on the VM to answer questions
+
+# Task 13 - Conclusion
+Conclusion
