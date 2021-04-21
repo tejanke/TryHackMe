@@ -49,3 +49,44 @@ osquery 4.8.0, your OS as a high-performance relational database
 Usage: osqueryi [OPTION]... [SQL STATEMENT]                                                                      
 ```
 
+# Task 3 - Osquery Shell
+* osqueryi is a modified version of the SQLite shell
+```
+osqueryi
+Using a virtual database. Need help, type '.help'
+osquery> 
+```
+* help
+```
+osquery> .help
+Welcome to the osquery shell. Please explore your OS!
+You are connected to a transient 'in-memory' virtual database.
+
+.all [TABLE]     Select all from a table
+```
+* list tables
+```
+osquery> .tables 
+```
+* list tables that relate to processes
+```
+osquery> .tables process
+  => process_envs
+```
+* list schema for the processes table
+```
+osquery> .schema processes
+CREATE TABLE processes(`pid` BIGINT, `name` TEXT, `path` TEXT, `cmdline` TEXT, `state` TEXT, `cwd` TEXT, `root` TEXT, `uid` BIGINT, `gid` BIGINT, `euid` BIGINT, `egid` BIGINT, `suid` BIGINT, `sgid` BIGINT, `on_disk` INTEGER, `wired_size` BIGINT, `resident_size` BIGINT, `total_size` BIGINT, `user_time` BIGINT, `system_time` BIGINT, `disk_bytes_read` BIGINT, `disk_bytes_written` BIGINT, `start_time` BIGINT, `parent` BIGINT, `pgroup` BIGINT, `threads` INTEGER, `nice` INTEGER, `is_elevated_token` INTEGER HIDDEN, `elapsed_time` BIGINT HIDDEN, `handle_count` BIGINT HIDDEN, `percent_processor_time` BIGINT HIDDEN, `upid` BIGINT HIDDEN, `uppid` BIGINT HIDDEN, `cpu_type` INTEGER HIDDEN, `cpu_subtype` INTEGER HIDDEN, `phys_footprint` BIGINT HIDDEN, PRIMARY KEY (`pid`)) WITHOUT ROWID;
+```
+* show defaults
+```
+.show
+```
+* change output mode
+```
+.mode
+```
+* exit the application
+```
+.quit
+```
