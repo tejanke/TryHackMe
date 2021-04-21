@@ -24,3 +24,7 @@ Tools
 * https://etherscan.io/
 
 # Task 5 - Taunt
+Using Google search, onion, and wigle
+
+# Task 6 - Homebound
+Using twitter profile from the user above, image search and airport codes, and Google maps
