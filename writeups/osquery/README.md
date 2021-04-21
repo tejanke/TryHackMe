@@ -90,3 +90,41 @@ CREATE TABLE processes(`pid` BIGINT, `name` TEXT, `path` TEXT, `cmdline` TEXT, `
 ```
 .quit
 ```
+
+# Task 4 - Schema Documentation
+Schema documentation is listed here
+* https://osquery.io/schema/4.7.0/
+
+Answer questions based on the documentation link above
+
+# Task 5 - Creating queries
+SQL implemented in Osquery is not the entire language, but a subset
+
+Example queries
+* select pid, name, path from processes;
+* select count(*) from processes;
+* select pid, name, path from processes where name='lsass.exe';
+
+Filtering operators
+* = : equal
+* <> : not equal
+* > and >= : greater than and greater than or equal
+* < and <= : less than and less than or equal
+* BETWEEN : between a range
+* LIKE : pattern wildcard search
+* % : wildcard with multiple choices
+* _ : wildcard with one character
+
+Wildcard rules
+* % : match all files and folders for one level
+* %% : match all files and folders recursively
+* %abc : match all ending with abc
+* abc% : match all beginning with abc
+
+Wildcard examples
+* /users/%/library : monitor every user library folder
+* /users/%/library/ : monitor changes within each library folder
+* /users/%/library/% : same as above
+* /users/%/library/%% : recursively
+* /bin/%sh : monitor bin for changes ending in sh
+
