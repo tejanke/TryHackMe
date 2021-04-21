@@ -1,0 +1,51 @@
+# Room
+https://tryhackme.com/room/osqueryf8
+
+# Task 1 - Intro
+Osquery is an open source tool created by Facebook
+* https://osquery.io/
+
+Osquery allows you to query an endpoint using SQL syntax.  Some open source and commercial tools utilize Osquery including Alienvault and Cisco
+
+# Task 2 - Installation
+Install docs by OS
+* Windows
+  * https://osquery.readthedocs.io/en/stable/installation/install-windows/
+* Linux
+  * https://osquery.readthedocs.io/en/stable/installation/install-linux/
+* macOS
+  * https://osquery.readthedocs.io/en/stable/installation/install-macos/
+* FreeBSD
+  * https://osquery.readthedocs.io/en/stable/installation/install-freebsd/
+
+Useful CLI flags
+* https://osquery.readthedocs.io/en/latest/installation/cli-flags/
+
+Example Linux Install
+```
+wget https://pkg.osquery.io/deb/osquery_4.8.0-1.linux_amd64.deb                                            [195/247]
+--2021-04-21 10:45:32--  https://pkg.osquery.io/deb/osquery_4.8.0-1.linux_amd64.deb                                                                           
+Resolving pkg.osquery.io (pkg.osquery.io)... 199.232.10.133                                                                                                   
+Connecting to pkg.osquery.io (pkg.osquery.io)|199.232.10.133|:443... connected.                                                                               
+HTTP request sent, awaiting response... 200 OK                                                                                                                
+Length: 16376890 (16M) [application/vnd.debian.binary-package]                                                                                                
+Saving to: ‘osquery_4.8.0-1.linux_amd64.deb’                                                                                                                  
+osquery_4.8.0-1.linux_amd64.deb         100%[=============================================================================>]  15.62M  2.82MB/s    in 5.5s     
+2021-04-21 10:45:38 (2.82 MB/s) - ‘osquery_4.8.0-1.linux_amd64.deb’ saved [16376890/16376890]                                                                 
+                                                                                                                                                              
+
+sudo dpkg -i osquery_4.8.0-1.linux_amd64.deb                                                                        
+Selecting previously unselected package osquery.                                                                                                              
+(Reading database ... 506787 files and directories currently installed.)                                                                                      
+Preparing to unpack osquery_4.8.0-1.linux_amd64.deb ...                                                                                                       
+Unpacking osquery (4.8.0-1.linux) ...                                                                                                                         
+Setting up osquery (4.8.0-1.linux) ...                                                                                                                        
+1274                                                                                                                                                          
+Processing triggers for kali-menu (2021.2.0) ...                                                                                                              
+
+
+osqueryi --help                                                                                                     
+osquery 4.8.0, your OS as a high-performance relational database                                                                                              
+Usage: osqueryi [OPTION]... [SQL STATEMENT]                                                                      
+```
+
