@@ -128,3 +128,12 @@ Wildcard examples
 * /users/%/library/%% : recursively
 * /bin/%sh : monitor bin for changes ending in sh
 
+# Task 6 - Kolide Fleet
+Kolide Fleet is an Osquery fleet manager that allows you to query multiple endpoints instead of each individually
+
+Commercial
+* https://www.kolide.com/launcher/
+
+Open source fork
+* https://github.com/fleetdm/fleet
+
