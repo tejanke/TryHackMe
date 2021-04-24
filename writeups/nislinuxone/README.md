@@ -16,3 +16,8 @@ ls lists the contents of a directory
 # Task 3 - cat
 cat is used to print a file's contents to the screen.  tac is like cat, but in reverse.  head is used to print lines from the beginning of the file.  tail is used to print lines from the end of the file.  xxd is used to generate a hex dump of the contents of a file.  base64 is used to encode or decode something
 
+# Task 4 - find
+find is used to look for files on the system
+
+* find / -type f -name "*.cfg"
+* find . -type f -name letter.txt
