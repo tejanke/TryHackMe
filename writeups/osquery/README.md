@@ -137,3 +137,8 @@ Commercial
 Open source fork
 * https://github.com/fleetdm/fleet
 
+# Task 7 - Extensions
+Extension links
+* https://github.com/trailofbits/osquery-extensions
+* https://github.com/polylogyx/osq-ext-bin
+
