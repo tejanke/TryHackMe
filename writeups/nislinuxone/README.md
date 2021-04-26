@@ -48,3 +48,17 @@ hexeditor allows you to view a file in hex format
 # Task 11 - curl
 curl is a command line tool for HTTP, FTP, and others
 
+# Task 12 - wget
+wget can download files from HTTP, HTTPS, and others
+
+# Task 13 - tar
+tar lets you create, maintain, modify, and extract tar files
+
+# Task 14 - gzip
+gzip is used for file compression/decompression
+
+# Task 15 - 7zip
+7zip is a free open source file archiver
+
+# Task 16 - binwalk
+binwalk allows users to analyze and extract firmware images
