@@ -51,3 +51,12 @@ After the file is uploaded you can start your listener with nc -nvlp and then ex
 * Dictionary Attacks with Burp Suite
 
 Using Burp Suite intruder with the cluster bomb setting, brute force your way into the web application login system using the provided short list of possible credentials while observing the differences in response output
+
+# Task 6 - Day 4 - WEb Exploitation
+* Fuzzing
+* gobuster
+* wfuzz
+
+Wordlists
+* https://github.com/danielmiessler/SecLists
+
