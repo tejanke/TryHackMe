@@ -44,3 +44,10 @@ The questions are completed by using the information on the displayed web page. 
 https://raw.githubusercontent.com/pentestmonkey/php-reverse-shell/master/php-reverse-shell.php
 
 After the file is uploaded you can start your listener with nc -nvlp and then execute the reverse shell and grab the flag
+
+# Task 5 - Day 3 - Web Exploitation
+* Authentication
+* Default Credentials
+* Dictionary Attacks with Burp Suite
+
+Using Burp Suite intruder with the cluster bomb setting, brute force your way into the web application login system using the provided short list of possible credentials while observing the differences in response output
