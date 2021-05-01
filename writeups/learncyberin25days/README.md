@@ -52,7 +52,7 @@ After the file is uploaded you can start your listener with nc -nvlp and then ex
 
 Using Burp Suite intruder with the cluster bomb setting, brute force your way into the web application login system using the provided short list of possible credentials while observing the differences in response output
 
-# Task 6 - Day 4 - WEb Exploitation
+# Task 6 - Day 4 - Web Exploitation
 * Fuzzing
 * gobuster
 * wfuzz
@@ -60,3 +60,21 @@ Using Burp Suite intruder with the cluster bomb setting, brute force your way in
 Wordlists
 * https://github.com/danielmiessler/SecLists
 
+# Task 7 - Day 5 - Web Exploitation
+* SQL Injection
+  * Login Bypass
+  * Blind SQL Injection
+  * Union SQL Injection
+* SQLMap
+  * SQLMap and Burp Suite
+
+* Resources
+  * https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/SQL%20Injection
+  * https://github.com/payloadbox/sql-injection-payload-list
+  * https://www.codecademy.com/articles/sql-commands
+
+```
+' or true --
+
+sqlmap -r r.request --dump-all --dbms sqlite --tamper=space2comment
+```
