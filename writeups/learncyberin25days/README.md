@@ -78,3 +78,37 @@ Wordlists
 
 sqlmap -r r.request --dump-all --dbms sqlite --tamper=space2comment
 ```
+
+# Task 8 - Day 6 - Web Exploitation
+* XSS
+  * Stored XSS
+  * Reflected XSS
+* Detection
+  * OWASP ZAP
+* Resources
+  * https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Input_Validation_Cheat_Sheet.md
+  * https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/XSS%20Injection
+  * https://github.com/payloadbox/xss-payload-list
+
+# Task 9 - Day 7 - Networking
+* IP Address
+  * Public
+  * Private
+  * NAT
+* Protocols
+  * TCP
+    * Three-Way Handshake
+    * ISN
+    * Reassembly
+  * IP
+* Wireshark
+  * Filters
+
+```
+icmp
+http.request.method eq get
+http.request.method == "GET"
+ftp
+ftp.request.command == "PASS"
+File > Export Objects > HTTP
+```
