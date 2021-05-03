@@ -112,3 +112,33 @@ ftp
 ftp.request.command == "PASS"
 File > Export Objects > HTTP
 ```
+
+# Task 10 - Day 8 - Networking
+* nmap
+* scanning
+  * three-way handshake
+  * connect scan : -sT
+  * SYN scan : -sS
+  * results
+    * SYN/ACK = open
+    * RST = closed
+    * Multiple attempts = filtered
+  * additional types
+    * -A - identify services
+    * -O - OS detection
+    * -p - scan specific port
+    * -p- - scan all ports
+    * -sV - version and fingerprint
+* timing
+  * -T0 - stealthiest
+  * -T5 - most aggressive
+* scripting engine
+  * --script
+
+* scanning defense
+  * snort
+  * suricata
+
+```
+map -A -T4 10.10.33.224 | tee nmap.txt
+```
