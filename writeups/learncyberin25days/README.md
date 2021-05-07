@@ -200,3 +200,20 @@ smbclient //10.10.178.30/tbfc-hr
 
 * Resources
   * https://dvwa.co.uk/
+
+# Task 14 - Day 12 - Networking
+* Vulnerabilities
+  * https://www.rapid7.com/
+  * https://attackerkb.com/
+  * https://cve.mitre.org/cve/
+  * https://www.exploit-db.com/
+* CGI
+  * /cgi-bin
+  * arguments
+    * ?&
+    * ?&ls
+    * URL encoded
+      * https://www.techopedia.com/definition/10346/url-encoding
+* metasploit
+  * search for CVE
+  * set targeturi to /cgi-bin/[thescriptname]
