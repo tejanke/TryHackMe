@@ -294,3 +294,19 @@ Password:
 firefart@christmas:/home/santa# whoami                                                                                                               
 firefart                                           
 ```
+
+# Task 16 - Day 14 - OSINT
+OSINT Challenge
+* Resources
+  * https://namechk.com/
+  * https://whatsmyname.app/
+  * https://namecheckup.com/
+  * https://github.com/WebBreacher/WhatsMyName
+  * https://github.com/sherlock-project/sherlock
+  * https://yandex.com/images/
+  * https://tineye.com/
+  * https://www.bing.com/visualsearch?FORM=ILPVIS
+  * https://haveibeenpwned.com/
+  * https://dehashed.com/
+  * https://scylla.so/
+
