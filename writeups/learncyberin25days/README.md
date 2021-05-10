@@ -310,3 +310,20 @@ OSINT Challenge
   * https://dehashed.com/
   * https://scylla.so/
 
+# Task 17 - Day 15 - Scripting
+* Python
+  * interpreted, high level, general purpose programming language
+  * variables
+    * string
+    * integer
+    * float
+    * list
+  * operators : + / * ** % -
+  * boolean
+    * true
+    * false
+  * if statements
+  * loops
+  * libraries
+    * https://pypi.org/
+  * pass by reference
