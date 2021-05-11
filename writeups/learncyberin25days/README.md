@@ -327,3 +327,27 @@ OSINT Challenge
   * libraries
     * https://pypi.org/
   * pass by reference
+
+# Task 18 - Day 16 - Scripting
+Challenge - Find the API key using Python
+
+My solution
+```
+#!/usr/bin/python3
+import requests
+
+url = "http://10.10.110.175/api/"
+keys = range(1,100,2)
+
+print("Trying API keys against {}".format(url))
+print("Scanning keys...")
+for k in keys:
+    test_url = url + str(k)
+    r = requests.get(test_url)
+    print(k, end='')
+    if "Key not valid" not in r.text:
+        print("")
+        print("Key found with key {}".format(k))
+        print(r.text)
+        break
+```
