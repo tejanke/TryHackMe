@@ -399,3 +399,10 @@ for k in keys:
 
 
 * Practical challenge
+  * r2 -d ./challenge
+  * aa
+  * pdf @main
+  * use db memoryaddress to set breakpoints
+  * use dc to execute to breakpoints
+  * use px @variable names to discover values that are set
+
