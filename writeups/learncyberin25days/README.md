@@ -351,3 +351,51 @@ for k in keys:
         print(r.text)
         break
 ```
+
+# Task 19 - Day 17 - Reverse Engineering
+* Machine code
+  * encoded as bytes
+  * x86-64 - most common
+  * readable form = assembly
+  * produced by a compiler
+  * instruction set
+    * 16 bit > 32 bit > 64 bit
+  * radare2 - framework for RE and binary analysis
+
+* Practical
+  * r2 -d ./filename
+    * opens filename in debug mode
+  * aa
+    * ask r2 to analyze the program
+  * ?
+    * general help
+  * afl | grep main
+    * find the main entry point
+  * pdf @main
+    * print disassembly function for main
+  * registers
+  * register operations
+    * transfer data to and from memory and a register
+    * perform arithmetic ops on registers and data
+    * transfer control to other parts of the program
+  * data types
+    * b - byte - 1 byte
+    * w - word - 2 byte
+    * l - double word - 4 byte
+    * q - quad - 8 byte
+    * s - single precision - 4 byte
+    * l - double precision - 8 byte
+  * instructions
+  * breakpoints
+    * set one with the db command followed by the memory address
+      * db 0x00400b55
+      * pdf @main again and look for a b to identify your breakpoint
+  * dc
+    * continue execution
+  * px @memory_address_here
+    * read memory
+  * ood
+    * reset file
+
+
+* Practical challenge
