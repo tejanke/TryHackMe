@@ -406,3 +406,12 @@ for k in keys:
   * use dc to execute to breakpoints
   * use px @variable names to discover values that are set
 
+# Task 20 - Day 19 - Reverse Engineering
+* .Net framework
+  * ILSpy
+    * https://github.com/icsharpcode/ILSpy
+  * Dotpeek
+    * https://www.jetbrains.com/decompiler/
+
+* Practical
+  * Use ILSpy on a test application to recover a password and flag
