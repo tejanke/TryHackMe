@@ -406,7 +406,7 @@ for k in keys:
   * use dc to execute to breakpoints
   * use px @variable names to discover values that are set
 
-# Task 20 - Day 19 - Reverse Engineering
+# Task 20 - Day 18 - Reverse Engineering
 * .Net framework
   * ILSpy
     * https://github.com/icsharpcode/ILSpy
@@ -415,3 +415,30 @@ for k in keys:
 
 * Practical
   * Use ILSpy on a test application to recover a password and flag
+
+# Task 21 - Day 19 - Web Exploitation
+* SSRF - Server-Side Request Forgery
+* localtest.me
+
+# Task 22 - Day 20 - Blue Teaming
+PowerShell is a cross-platform task automation and configuration management framework
+
+* get-childitem - like dir
+  * -path
+  * -file
+  * -directory
+  * -filter
+  * -recurse
+  * -hidden
+  * -erroraction
+* get-content - like type/cat
+  * -path
+* set-location - like cd
+* select-string - like grep
+* get-help - list help options
+
+```
+get-content -path c:\path\to\file.txt | measure-object -word
+(get-content -path c:\path\to\file.txt)[index#]
+select-string -path c:\path\to\file.txt -pattern 'pattern'
+```
