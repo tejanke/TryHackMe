@@ -442,3 +442,23 @@ get-content -path c:\path\to\file.txt | measure-object -word
 (get-content -path c:\path\to\file.txt)[index#]
 select-string -path c:\path\to\file.txt -pattern 'pattern'
 ```
+
+# Task 23 - Day 21 - Blue Teaming
+* ADS - Alternate Data Streams - a file attribute specific to Windows NTFS.  Every file has at least one data stream ($DATA) and ADS allows files to contain more than one stream of data.  Natively Windows Explorer doesn't display ADS to the user.
+* PowerShell
+  * get-filehash
+    * -algorithm
+  * get-item
+    * -path
+    * -stream *
+* strings64 -accepteula file.exe
+* wmic process call create $(resolve-path file.exe:streamname)
+
+Challenge
+* Use get-filehash, strings64, and wmic process cal to answer questions
+
+# Task 24 - Day 22 - Blue Teaming
+* Password Managers
+* CyberChef
+  * https://gchq.github.io/CyberChef/
+
