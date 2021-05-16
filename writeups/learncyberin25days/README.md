@@ -462,3 +462,7 @@ Challenge
 * CyberChef
   * https://gchq.github.io/CyberChef/
 
+Challenge
+* Use CyberChef to identify and decode credentials.  A useful online tool in the exercise is also:
+  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/fromCharCode
+
