@@ -466,3 +466,15 @@ Challenge
 * Use CyberChef to identify and decode credentials.  A useful online tool in the exercise is also:
   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/fromCharCode
 
+# Task 25 - Day 23 - Blue Teaming
+* Ransomware - a type of malware that threatens to publish the victim's data or block access to it unless a random is paid
+
+* Mitigations
+  * Volume Shadow Copy Service
+    * vssadmin
+      * list volumes
+  * Task Scheduler
+
+Challenge
+* Decode a base64 encoded string, search for Ransomware encrypted files, review Task Scheduler to gain more information on the infection, review the VSS scheduled task and find the volume ID, assign a drive letter to a partition and find a hidden folder, restore a backup from version history
+
