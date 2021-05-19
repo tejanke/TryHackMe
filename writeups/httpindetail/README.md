@@ -47,3 +47,31 @@ Referer: https://tryhackme.com/
   * Content-Type = what sort of information is transmitted, HTML, images, etc
   * Content-Length = how long the response is
 
+# Task 3 - HTTP Methods
+HTTP methods are a way for the client to show their intended action.
+
+* GET - get information from the server
+* POST - submit data to the server
+* PUT - submit and update information to the server
+* DELETE - remove information from the server
+
+# Task 4 - HTTP Status Codes
+Ranges
+* 100-199 - Informational
+* 200-299 - Success
+* 300-399 - Redirection
+* 400-499 - Client Errors
+* 500-599 - Server Errors
+
+Common Status Codes
+* 200 OK - request completed with success
+* 201 - Created - resource created
+* 301 - Permanent Redirect - redirects browser
+* 302 - Temporary Redirect - temporary redirect
+* 400 - Bad Request - the request was bad
+* 401 - Not Authorized - authentication is incorrect
+* 403 - Forbidden - no permissions
+* 404 - Page Not Found - page doesn't exist
+* 405 - Method Not Allowed - resource doesn't allow this request
+* 500 - Internal Service Error - server error
+* 503 - Service Unavailable - server can't handle your request
