@@ -75,3 +75,62 @@ Common Status Codes
 * 405 - Method Not Allowed - resource doesn't allow this request
 * 500 - Internal Service Error - server error
 * 503 - Service Unavailable - server can't handle your request
+
+# Task 5 - Headers
+Headers are additional bits of data you can send to the web server when making requests
+
+Common Request Headers
+* Host - the host header allows you to specify what actual website you are looking to go to for a web server that hosts multiple web sites, such as www.example.com or www.example2.com
+* User-Agent - advises the web server of your browser details so that it can format the website properly
+* Content-Length - tells the server how much data to expect
+* Accept-Encoding - tells the server what type of compression the browser supports
+* Cookie - session cookie to use
+
+Common Response Headers
+* Set-Cookie - session information to store
+* Cache-Control - how long to store the content you receive
+* Content-Type - what type of data is returned, HTML, CSS, images, etc
+* Content-Encoding - what method of compression is used
+
+# Task 6 - Cookies
+Cookies are small pieces of data stored on your computer to use in your session.  Cookies are saved when you receive the Set-Cookie header.  Every subsequent request uses the Cookie header with that cookie.  Cookies remind the server who you are.  Cookies are used to store information about your session like authentication
+
+# Task 7 - Making Requests
+HTTP Challenge with manual requests
+
+```
+GET /room HTTP/1.1
+Host: tryhackme.com
+User-Agent: Mozilla/5.0 Firefox/87.0
+```
+
+```
+GET /blog?id=1 HTTP/1.1
+Host: tryhackme.com
+User-Agent: Mozilla/5.0 Firefox/87.0
+```
+
+```
+DELETE /user/1 HTTP/1.1
+Host: tryhackme.com
+User-Agent: Mozilla/5.0 Firefox/87.0
+Content-Length: 0
+```
+
+```
+PUT /user/2 HTTP/1.1
+Host: tryhackme.com
+User-Agent: Mozilla/5.0 Firefox/87.0
+Content-Length: 14
+
+username=admin 
+```
+
+```
+POST /login HTTP/1.1
+Host: tryhackme.com
+User-Agent: Mozilla/5.0 Firefox/87.0
+Content-Length: 33
+
+username=thm&password=letmein 
+```
