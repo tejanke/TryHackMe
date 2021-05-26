@@ -9,3 +9,4 @@ Resources
 # Task 2 - Overt, Covert, and Surreptitious Entry
 Overt entry is when the method of entry causes damage or destruction.  Covert entry is usually undetectable to un-trained people.  Surreptitious entry is when the method of entry is undetectable to both un-trained and trained people
 
+# Task 3 - Lock Picking
