@@ -18,3 +18,7 @@ Overt entry is when the method of entry causes damage or destruction.  Covert en
 # Task 6 - Hardware Bypassing
 
 # Task 7 - Resources
+* https://www.youtube.com/user/amihirata
+* https://www.youtube.com/user/DeviantOllam
+* https://toool.us/
+
