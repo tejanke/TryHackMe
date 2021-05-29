@@ -70,3 +70,5 @@ invoke-webrequest www.google.com
 ```
 [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String(string_here)
 ```
+
+# Task 4 - Enumeration
