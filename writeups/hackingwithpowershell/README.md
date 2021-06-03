@@ -72,3 +72,26 @@ invoke-webrequest www.google.com
 ```
 
 # Task 4 - Enumeration
+Answer questions based on using PowerShell only
+
+Local users
+```
+get-localuser
+get-localuser | select name,SID
+get-localuser | select passwordrequired
+```
+Local groups
+```
+get-localgroups | measure
+```
+Networking
+```
+get-netipaddress
+get-nettcpconnection | where {$_.State -eq "Listen"} | measure | select count
+get-nettcpconnection | where {$_.localport -eq "445"}
+```
+Patches
+```
+get-hotfix | measure
+get-hotfix | where {$_.HotFixID -eq "KB4023834" }
+```
