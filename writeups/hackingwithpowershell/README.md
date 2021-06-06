@@ -95,3 +95,53 @@ Patches
 get-hotfix | measure
 get-hotfix | where {$_.HotFixID -eq "KB4023834" }
 ```
+Files
+```
+get-childitem -literalpath c:\ *.bak* -file -recurse | gc
+get-childitem c:\ -recurse | select API_KEY | select filename
+```
+Processes
+```
+get-process
+```
+Scheduled Tasks
+```
+get-scheduledtask
+get-scheduledtask taskname
+```
+Permissions
+```
+get-acl c:\
+```
+
+# Task 5 - Scripting Challenge
+Find the password and HTTPS link in the documents in the emails directory
+```
+$dirs = get-childitem C:\users\Administrator\Desktop\emails
+foreach($dir in $dirs){
+    $docs = get-childitem C:\users\Administrator\Desktop\emails\$dir
+    foreach($doc in $docs){
+        write-host $doc
+        get-content C:\users\Administrator\Desktop\emails\$dir\$doc | select-string password
+        get-content C:\users\Administrator\Desktop\emails\$dir\$doc | select-string https
+    }
+}
+```
+
+# Task 6 - Intermediate Challenge
+Make a simple port scanner with Test-NetConnection (very slow)
+```
+$ip = read-host -Prompt "Enter a single IP address to scan"
+$ports = read-host -Prompt "Enter port range to scan such as 10-20"
+$ports = $ports.Replace("-","..")
+$port_range = invoke-expression $ports
+$open_ports = 0
+foreach($port in $port_range){
+    $result = test-netconnection -computer $ip -port $port | select TcpTestSucceeded
+    if($result.TcpTestSucceeded -eq $True){
+        write-host "Port $port open."
+        $open_ports++
+        }
+  }
+write-host "There are $open_ports open ports on $ip"
+```
