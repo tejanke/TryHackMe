@@ -19,3 +19,8 @@ Evidence of persistence includes
 * SSH keys
 
 Review the cron file at /etc/crontab
+
+# Task 5 - User Accounts
+* /etc/passwd - contains names of most accounts on the system
+* /etc/shadow - contains names and password hashes, strict permissions
+
