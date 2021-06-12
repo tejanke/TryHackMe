@@ -40,3 +40,10 @@ sudo find / -name "*keys" -type f 2>/dev/null
 * auth.log - contains a history of all commands run using sudo
 * history.log - history of all tasks performed using apt
 
+# Task 10 - Deploy VM
+Deploy
+
+# Task 11 - Persistence Mechanisms
+Practical, find the ghost in the machine
+
+Examine running services, systemctl status
