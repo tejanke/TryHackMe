@@ -24,3 +24,19 @@ Review the cron file at /etc/crontab
 * /etc/passwd - contains names of most accounts on the system
 * /etc/shadow - contains names and password hashes, strict permissions
 
+# Task 6 - Deploy VM
+Deploy
+
+# Task 7 - Apache Log Analysis
+Review Apache log file and answer questions.  You can process binary files with grep -a
+
+# Task 8 - Persistence Mechanisms
+Search for authorized_keys files
+
+sudo find / -name "*keys" -type f 2>/dev/null
+
+# Task 9 - Program Execution History
+* bash_history - history of commands run in bash
+* auth.log - contains a history of all commands run using sudo
+* history.log - history of all tasks performed using apt
+
