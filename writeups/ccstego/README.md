@@ -5,7 +5,7 @@ https://tryhackme.com/room/ccstego
 Steganography is the art of concealing something inside something else
 
 # Task 2 - Steghide
-Steghide is a famous steganongraphy tool that allows you to hide a message inside an image, among other things
+Steghide is a famous steganongraphy tool that allows you to hide a message inside a jpg image, among other things
 
 Install
 * sudo apt install steghide
@@ -21,4 +21,15 @@ Useful arguments
 Example
 ```
 steghide extract -sf filename
+```
+
+# Task 3 - zsteg
+zsteg is like steghide, but it is for png and bmp files
+
+Install
+* gem install zsteg
+
+Example
+```
+zsteg png1.png -v
 ```
