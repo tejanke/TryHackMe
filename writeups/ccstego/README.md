@@ -33,3 +33,25 @@ Example
 ```
 zsteg png1.png -v
 ```
+
+# Task 4 - exiftool
+exiftool allows you to view and edit image metadata
+
+Install
+* sudo apt install exiftool
+
+Example
+```
+exiftool jpeg3.jpeg
+```
+
+# Task 5 - stegoveritas
+stegoveritas supports about every image file and is able to extract data
+
+Install
+* pip3 install stegoveritas
+
+Example
+```
+stegoveritas -steghide filename
+```
