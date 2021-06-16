@@ -55,3 +55,12 @@ Example
 ```
 stegoveritas -steghide filename
 ```
+
+# Task 6 - Spectrograms
+Spectrogram steganography is the art of hiding image inside audio
+
+Tools
+* https://www.sonicvisualiser.org/download.html
+
+# Task 7 - Exam
+Practical using exiftool, steghide, stegoveritas, Sonic Visualiser, and QR codes
