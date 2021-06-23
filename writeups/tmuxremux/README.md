@@ -36,3 +36,20 @@ Deploy
   * swap-pane -s [destination_number] -t [source_number]
   * pane numbers start at 0 and are numbered clockwise
   * you can also reverse this, -t [source_number] -s [destination_number]
+
+# Task 4 - Manage tmux windows
+* windows are like a terminal tab
+* create new window: ctrl+b+c
+* change window name: ctrl+b+,
+* detach pane into its own window: ctrl+b+shift!
+* cycle to next window: ctrl+b+n
+* cycle to previous window: ctrl+b+p
+* list windows to cycle to: ctrl+b+w
+* kill window: ctrl+b+shift+&+y
+* join windows/panes: ctrl+b+shift+:
+  * join-pane -s [source_window_name]
+  * join-pane -t [destination_window_name]
+  * add an -v to fuse veritcally
+  * add an -h to fuse horizontally
+
+
