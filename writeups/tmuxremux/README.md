@@ -52,4 +52,19 @@ Deploy
   * add an -v to fuse veritcally
   * add an -h to fuse horizontally
 
+# Task 5 - Copy mode
+* Can be used to scroll up and down the page
+* start copy mode: ctrl+b+[
+* exit copy mode: q
+* search up: ctrl+r
+* continue search: hold ctrl, press r
+* resume scrolling: press enter
+* search down: ctrl+s
+* to copy and paste:
+  * ctrl+b+[
+  * scroll to start of block of text
+  * ctrl+spacebar to enable highlighting, then highlight
+  * copy highlighted text with alt+w
+  * paste: ctrl+b+]
+* check what is in clipboard: ctrl+b+shift+#
 
