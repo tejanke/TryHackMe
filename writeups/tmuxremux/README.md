@@ -68,3 +68,34 @@ Deploy
   * paste: ctrl+b+]
 * check what is in clipboard: ctrl+b+shift+#
 
+# Task 6 - tmux and beyond
+* show tmux config defaults: tmux show -g
+* save config in /home/username directory
+* save config with name .tmux.conf
+* config file options
+  * status bar color: set -g status-style bg='#443311',fg='223344'
+  * selected window color: set -g window-status-current-style fg=black,bg=white
+  * set a different prefix: set -g prefix C-a
+  * use script on right: set -g status-right " #[fg="red,bold"]#(~/script.sh) "
+  * variables
+    * #H : hostname
+    * %H:%M : hour and minutes on the clock
+    * %d-%b-%y : day, month, year
+  * change copy mode hotkeys to vim: set -g mode-keys vi
+  * load plugin: set -g @plugin 'dir/plugin-name'
+* reload config file: ctrl+b+shift+:
+  * source-file /home/username/.tmux.conf
+  * source-file ~/.tmux.conf
+* reset config: tmux kill-server
+* run plugin after loading it: run-shell
+
+
+Resources
+* tmux plugins: https://github.com/tmux-plugins/
+* usable config: https://www.hamvocke.com/blog/a-guide-to-customizing-your-tmux-conf/
+* config examples: https://www.golinuxcloud.com/tmux-config/
+* config examples: https://arcolinux.com/everything-you-need-to-know-about-tmux-plugins-manager/
+* config examples: https://www.barbarianmeetscoding.com/blog/jaimes-guide-to-tmux-the-most-awesome-tool-you-didnt-know-you-needed
+
+# Task 7 - Conclusion
+Conclusion
