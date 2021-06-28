@@ -39,3 +39,19 @@ Decode the text
 # Task 10
 Review the challenge HTML source to find the flag
 
+# Task 11
+Download the task file and fix the file header
+* Resources
+  * ghex
+  * https://en.wikipedia.org/wiki/List_of_file_signatures
+
+# Task 12
+Browse social media for the flag
+
+# Task 13
+Decode the encoded text
+* Resources
+  * https://www.dcode.fr/brainfuck-language
+
+# Task 14
+Decode the encoded text
