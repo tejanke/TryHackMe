@@ -55,3 +55,32 @@ Decode the encoded text
 
 # Task 14
 Decode the encoded text
+
+# Task 15
+Use binwalk to extract data from the file
+
+# Task 16
+Examine the png file to find the flag
+
+# Task 17
+Decode task file, listen
+* Resources
+  * https://speech-to-text-demo.ng.bluemix.net/
+
+# Task 18
+Use the wayback machine
+* Resources
+  * https://archive.org/web/
+
+# Task 19
+Decode the text
+* Resources
+  * https://gchq.github.io/CyberChef/
+
+# Task 20
+Decode the text
+* Resources
+  * https://gchq.github.io/CyberChef/
+
+# Task 21
+Use Wireshark to search for packets
