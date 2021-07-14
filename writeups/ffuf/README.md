@@ -42,3 +42,23 @@ ffuf -u http://MACHINE_IP/FUZZ -fc 403 -w /usr/share/seclists/Discovery/Web-Cont
 
 ffuf -u http://MACHINE_IP/FUZZ -mc 200 -w /usr/share/seclists/Discovery/Web-Content/raft-medium-files-lowercase.txt -fr '/\..*'
 ```
+
+# Task 5 - Fuzzing parameters
+ffuf can be used to fuzz parameters in requests.  
+
+```
+ffuf -u 'http://10.10.253.28/sqli-labs/Less-1/?FUZZ=1' -c -w /usr/share/seclists/Discovery/Web-Content/burp-parameter-names.txt -fw 39
+```
+
+ffuf can read from stdout for a generated wordlist, in this case we are feeding it the values of 0 through 255
+
+```
+for i in {0..255}; do echo $i; done | ffuf -u 'http://10.10.253.28/sqli-labs/Less-1/?id=FUZZ' -c -w - -fw 33
+```
+
+ffuf can also be used with POST requests
+
+```
+ffuf -u http://10.10.253.28/sqli-labs/Less-11/ -c -w /usr/share/seclists/Passwords/Leaked-Databases/hak5.txt -X POST -d 'uname=Dummy&passwd=FUZZ&submit=Submit' -fs 1435 -H 'Content-Type: application/x-www-form-urlencoded' 
+```
+
