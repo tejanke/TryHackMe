@@ -62,3 +62,9 @@ ffuf can also be used with POST requests
 ffuf -u http://10.10.253.28/sqli-labs/Less-11/ -c -w /usr/share/seclists/Passwords/Leaked-Databases/hak5.txt -X POST -d 'uname=Dummy&passwd=FUZZ&submit=Submit' -fs 1435 -H 'Content-Type: application/x-www-form-urlencoded' 
 ```
 
+# Task 6 - Finding vhosts and subdomains
+ffuf can be used to find subdomains, but it isn't as efficient as purpose built tools
+
+```
+ffuf -u http://FUZZ.tryhackme.com -c -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt
+```
