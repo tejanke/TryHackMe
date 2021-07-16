@@ -68,3 +68,17 @@ ffuf can be used to find subdomains, but it isn't as efficient as purpose built 
 ```
 ffuf -u http://FUZZ.tryhackme.com -c -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt
 ```
+
+# Task 7 - Proxying traffic
+You can proxy traffic with ffuf for pivoting or use in Burp Suite.  Examples:
+
+```
+ ffuf -u http://10.10.139.124/ -c -w /usr/share/seclists/Discovery/Web-Content/common.txt -x http://127.0.0.1:8080
+ ffuf -u http://FUZZ.tryhackme.com -c -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt -replay-proxy http://127.0.0.1:8080
+```
+
+# Task 8 - Useful options
+ffuf has many useful options, you can find them by using ffuf -h.  Some popular ones are -request for using a raw HTTP request file, -ic to strip comments, and -v for printing full URLs and redirection locations
+
+# Task 9 - Conclusion
+Conclusion
