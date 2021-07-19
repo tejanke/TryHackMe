@@ -39,3 +39,22 @@ Review is sourced from man page of ld.so
   * LD_PRELOAD
   * --preload
   * /etc/ld.so.preload
+
+# Task 4 - Code Example
+Code Example
+
+# Task 5 - Review
+* Examples
+  * export LD_PRELOAD=$(pwd)/malicious.so
+  * sudo sh -c "echo $(pwd)/malicious.so > /etc/ld.so.preload"
+
+* Check
+  * ldd /bin/ls
+
+# Task 6 - Hiding files from ls
+* Examples
+  * readdir()
+  * dirent
+
+# Task 7 - Conclusion
+Conclusion
