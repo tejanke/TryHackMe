@@ -32,3 +32,44 @@ Before the term "cloud", you could outsource hosting or colocation of physical r
   * FortiGate
   * Palo Alto
 
+# Task 5 - Cloud Services
+* Cloud Services
+  * IaaS - Infrastructure as a Service
+  * PaaS - Platform as a Service
+  * SaaS - Software as a Service
+
+# Task 6 - Web Tech
+* Redundancy
+  * Active/Passive
+  * Active/Active
+* Reputation
+* Load Balancing
+
+# Task 7 - Cloud Types
+* Cloud Types
+  * Public
+    * fully virtualized environment
+    * AWS
+    * Azure
+    * GCP
+  * Private
+    * dedicated to your use
+    * OpenStack
+    * VMWare
+  * Hybrid
+    * A combination of Public and Private cloud
+  * Community
+    * Variation of public cloud that groups customers with similar risks and compliance
+      * Healthcare
+      * Legal
+      * Government
+
+# Task 8 - Proxy Servers
+A proxy acts as a relay between a client and a server
+
+* Types
+  * Forward
+  * Reverse
+
+# Task 9 - Conclusion
+Conclusion
