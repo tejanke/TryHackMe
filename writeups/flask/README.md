@@ -36,3 +36,21 @@ def admin():
 ```
 
 * By default Flask uses TCP port 5000
+
+# Task 4 - HTTP Methods
+* HTTP Methods
+  * GET
+  * POST
+* By default a route only answers GET requests
+* Flask supports using HTML for making templates
+
+# Task 5 - Files
+* File functions
+  * files
+  * save()
+
+# Task 6 - Flask Injection
+* One prior vulnerability was in Flask's template rendering engine
+
+# Task 7 - Conclusion
+Conclusion
