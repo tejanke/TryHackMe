@@ -18,3 +18,12 @@ About Jupyter
 
 # Task 5 - How notebooks run
 How notebooks run
+
+# Task 6 - Interacting with the filesystem
+Interacting with the filesystem
+
+# Task 7 - Data with Pandas
+Data with Pandas
+
+# Task 8 - Data with Matplotlib
+Data with Matplotlib
