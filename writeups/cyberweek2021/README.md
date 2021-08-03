@@ -14,3 +14,8 @@ Social Engineering Toolkit
 sed -i 's/WEB_PORT=80/WEB_PORT=100/g' /etc/setoolkit/set.config
 ```
 
+# Task 4 - Wordpress Hacking
+* wpscan
+  * wpscan --url http://site -U user -P wordlist
+* cewl
+  * cewl http://site > wordlist
