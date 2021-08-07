@@ -20,3 +20,26 @@ Network Scanner
 Port Scanner
 * figlet
 * socket
+
+# Task 6 - File Downloader
+File Downloader
+* requests
+* requests.get
+
+# Task 7 - Hash Cracker
+Hash Cracker
+* haslib
+* pyfiglet
+
+# Task 8 - Keyloggers
+Keyloggers
+* keyboard
+* keyboard.record
+
+# Task 9 - SSH Brute Forcing
+SSH Brute Forcing
+* paramiko
+* ssh_connect
+
+# Task 10 - Conclusion
+Conclusion
