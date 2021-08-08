@@ -142,3 +142,49 @@ Extension links
 * https://github.com/trailofbits/osquery-extensions
 * https://github.com/polylogyx/osq-ext-bin
 
+# Task 8 - Practical
+Using osquery in an Ubuntu terminal
+* kernel version
+```
+osquery> select version from kernel_info;
++-----------------------+
+| version               |
++-----------------------+
+[removed]
++-----------------------+
+```
+* uids
+```
+osquery> select uid from users where username = 'bravo';
++------+
+| uid  |
++------+
+[removed]
++------+
+```
+* yara scans
+```
+osquery> select * from yara where path ="/home/charlie/notes" AND sig_group="/var/osquery/yara/scanner.yara";
+osquery> select * from yara where path ="/home/tryhackme/notsus" AND sig_group="/var/osquery/yara/scanner.yara";
+```
+
+# Task 9 - Practical
+* grab tables that start with "serv"
+```
+osquery> .tables win
+  => winbaseobj
+  => windows_crashes
+  => windows_eventlog
+  => windows_events
+  => windows_optional_features
+  => windows_security_center
+  => windows_security_products
+```
+* grab 1 row from a query
+```
+osquery> select * from services limit 1;
+```
+* grab specific columns
+```
+osquery> select display_name, description from services where display_name like 'Windows Defender%';
+```
