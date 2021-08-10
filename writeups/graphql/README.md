@@ -19,8 +19,8 @@ Query example
 }
 ```
 
-* schema defines the types and fields of those types
-* Query is the root type
+* Schema defines the types and fields of those types
+* Query is the root type for GraphQL
 
 # Task 4 - Extract sensitive information
 * GraphQL documents itself
