@@ -54,11 +54,11 @@ rustscan -r
 ```
 rustscan -v
 ```
-* Select a batch size
+* Select a batch size for the scan
 ```
 rustscan -b
 ```
-* Set a timeout
+* Set a timeout for the scan
 ```
 rustscan -t
 ```
