@@ -31,3 +31,11 @@ Rustup is used to install versions of Rust.  Rust has 3 flavors, stable, beta, a
       * Rust has 4 release profiles, 0 to 4
       * binaries are stored in target/release
 
+# Task 4 - Variables
+* all variables are immutable in Rust by default
+* let x = 5;
+* to make a variable mutable append the mut keyword
+* let mut x = 9;
+
+* resources
+  * https://play.rust-lang.org/
