@@ -63,3 +63,20 @@ McSkidy is back, yeah!
 4. Cookie manipulation challenge
    * Load the challenge web site.  Open developer tools.  Refresh the page.  Go to Storage > Cookies tab in developer tools.  Grab the cookie value and manipulate it based on the challenge to gain admin access.  One useful tool for this is https://gchq.github.io
 
+# Task 8 - Day 3 - Christmas Blackout
+1. Content Discovery
+   * Content = assets and inner workings of the application: files, folders, pathways
+   * Content Discovery - find things we aren't supposed to see normally: config files, passwords, backups, etc
+2. Discovering Content
+   * Manually - manually traverse a file system looking for items of interest
+   * With Tools - use tools such as dirbuster and gobuster to help discover valuable assets
+3. Default Credentials
+   * Apps and services often come with default credentials enabled, you can exploit this
+4. Challenge
+   * Use a tool to find the admin page
+   ```
+   gobuster dir -w directory-list-lowercase-2.3-big.txt -u http://10.10.227.249
+   ```
+   * Use default creds to access the admin page
+   * Find the flag
+
