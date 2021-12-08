@@ -92,4 +92,22 @@ McSkidy is back, yeah!
    * Load the web page from the challenge.  Launch Burp.  Click the Proxy tab and make sure the "Intercept is on" button is enabled (default).  In the web browser use FoxyProxy to proxy requests to Burp.  In the web page enter bogus login information and submit.  In Burp the POST request is held, right click and choose "Send to Intruder".  Click the Intruder tab.  In the Intruder tab click the Positions tab.  Clear out the positions with the clear button.  Highlight your bogus password and click the add button.  Change attack type to Sniper.  Go to the Payloads tab.  Ensure Payload set 1 is selected.  Click the Load button in Payload Options and find the wordlist in the /root folder.  Click Start Attack.
 
 # Task 10 - Day 5 - Web Exploitation / Pesky Elf Forum
-1. 
+1. What is an XSS vulnerability
+   * XSS = Cross Site Scripting
+   * An injection attack where malicious JavaScript is injected into a web application
+   * Steal cookies, install a key logger, redirect, and more
+2. Types of XSS Vulnerabilities
+   * DOM = Document Object Model
+      * Programming interface for HTML and XML
+      * Allows programs to change document structure
+      * JavaScript execution happens directly in the browser
+   * Reflected
+      * Occurs when user supplied data in an HTTP request is included in the web page without any validation
+   * Stored
+      * The XSS payload is stored on the server
+      * Executed whenever other users visit the page
+   * Blind
+      * Similar to Stored
+      * You can't see the results of the payload
+3. Challenge
+   * Load the web page from the challenge.  Login with the provided credentials.  Examine the settings page and try to reset your password.  Notice that the password is now displayed in the URL.  Navigate to the forum and pick a thread to leave a comment on.  Next leave a comment with an HTML tag like <b>, does it show up and execute? Next leave a comment with a script tag using the password URL from the previous step : <script>fetch('/settings?new_password=pass123');</script>.  Submit the comment and then view the page source.  If the script tags are intact, you have successfully injected a Stored XSS.  Anyone that visits the page will have their password reset to pass123.  Login as the grinch with pass123.  Disable Buttmas.
