@@ -90,3 +90,5 @@ McSkidy is back, yeah!
    * Tools to perform fuzzing - Burp Suite, ffuf
 3. Challenge
    * Load the web page from the challenge.  Launch Burp.  Click the Proxy tab and make sure the "Intercept is on" button is enabled (default).  In the web browser use FoxyProxy to proxy requests to Burp.  In the web page enter bogus login information and submit.  In Burp the POST request is held, right click and choose "Send to Intruder".  Click the Intruder tab.  In the Intruder tab click the Positions tab.  Clear out the positions with the clear button.  Highlight your bogus password and click the add button.  Change attack type to Sniper.  Go to the Payloads tab.  Ensure Payload set 1 is selected.  Click the Load button in Payload Options and find the wordlist in the /root folder.  Click Start Attack.
+
+# Task 10 - Day 5 - Web Exploitation / Pesky Elf Forum
