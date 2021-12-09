@@ -111,3 +111,31 @@ McSkidy is back, yeah!
       * You can't see the results of the payload
 3. Challenge
    * Load the web page from the challenge.  Login with the provided credentials.  Examine the settings page and try to reset your password.  Notice that the password is now displayed in the URL.  Navigate to the forum and pick a thread to leave a comment on.  Next leave a comment with an HTML tag like <b>, does it show up and execute? Next leave a comment with a script tag using the password URL from the previous step : <script>fetch('/settings?new_password=pass123');</script>.  Submit the comment and then view the page source.  If the script tags are intact, you have successfully injected a Stored XSS.  Anyone that visits the page will have their password reset to pass123.  Login as the grinch with pass123.  Disable Buttmas.
+
+# Task 11 - Day 6 - Web Exploitation / Patch Management is Hard
+1. What is an LFI vulnerability
+   * LFI = Local File Inclusion
+   * a web app vulnerability that allows an attacker to include and read local files on the server
+   * caused by lack of secure code and no input validation
+2. Risks of LFI
+   * ability to read sensitive files
+   * can be chained to perform an RCE - Remote Code Execution
+3. Identifying and testing for LFI
+   * attackers are interested in HTTP parameters
+   * HTTP parameters can be manipulated to inject attack payloads
+   * some entry points can be found in HTTP GET or POST requests
+4. Exploiting LFI
+   * exploitation depends on the web app configuration
+5. PHP filter
+   * used in LFI to read the PHP page content
+6. PHP DATA
+   * used to include raw plaintext or base64 encoded data
+7. Challenge
+   * Load the web page from the challenge and explore various LFI vulnerabilities.  You will need to decode base64 encoded text to grab a credential filename and login credentials.
+   ```
+   http://10.10.161.76/index.php?err=/etc/flag
+
+   http://10.10.161.76/index.php?err=php://filter/convert.base64-encode/resource=index.php
+
+   http://10.10.161.76/index.php?err=php://filter/convert.base64-encode/resource=includes/creds.php
+   ```
