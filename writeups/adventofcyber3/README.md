@@ -219,3 +219,22 @@ McSkidy is back, yeah!
 
    http://10.10.177.223/search?username=mcskidy&role[$ne]=user
    ```
+
+# Task 13 - Day 8 - Special by John Hammond / Santa's Bag of Toys
+1. PowerShell Transcription Logs
+   * PowerShell Transcription Logs can capture the input and output of PowerShell commands
+   * It can be enabled in Group Policy or via the registry
+   ```
+   reg add HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\PowerShell\Transcription /v EnableTranscripting /t REG_DWORD /d 0x1 /f
+   reg add HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\PowerShell\Transcription /v OutputDirectory /t REG_SZ /d C:/ /f
+   reg add HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\PowerShell\Transcription /v EnableInvocationHeader /t REG_DWORD /d 0x1 /f
+   ```
+2. Walkthrough
+   * Use the exported transcription logs from Santa's laptop to answer the challenge questions
+   * Grab the base64 encoded certificate, use CyberChef to decode it and save to a dat file
+   * Load Shellbags Explorer and open the export dat file
+   * Using Shellbags explore the different folders and files
+   * Search for the github repo found in the folder tree view
+   * Explore the github repo to discover the password to the UHA archive
+   * Open the UHA archive to view the files
+
