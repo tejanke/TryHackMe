@@ -250,3 +250,32 @@ McSkidy is back, yeah!
    * Find clear text FTP commands : ftp
    * Examine uploaded FTP data : ftp-data
 
+# Task 15 - Day 10 - Networking / Offensive is the best defense
+* Intro to IP addresses, protocols, and ports
+* nmap basic flags
+   * -sT : TCP connect scan, completes TCP 3-way handshake
+   * -sS : TCP syn scan, sends syn, listens for response, does not complete TCP 3-way handshake
+   * -sV : identify version of service running on a port
+   * -p- : scan all ports
+   * -p1-300 : scan ports 1 to 300
+
+# Task 16 - Day 11 - Networking / Where are the reindeers
+* MS SQL Intro
+   * RDBMS - Relational Database Management Ssytem
+   * Default port = 1433
+* sqsh - sqsh is an interactive database shell
+   * connecting to a db with sqsh : sqsh -S [ip address] -U [user] -P [password]
+   * command cheatsheet: http://nellisks.com/ref/sybase/how_to.html
+* Challenge
+   * select * from reindeer.dbo.names;
+   * go
+   * select * from reindeer.dbo.schedule;
+   * go
+   * select * from reindeer.dbo.presents;
+   * go
+   * xp_cmdshell 'whoami';
+   * go
+   * xp_cmdshell 'dir c:\users';
+   * go
+   * xp_cmdshell 'type c:\test.txt';
+   * go
