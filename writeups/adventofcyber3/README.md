@@ -238,3 +238,15 @@ McSkidy is back, yeah!
    * Explore the github repo to discover the password to the UHA archive
    * Open the UHA archive to view the files
 
+# Task 14 - Day 9 - Networking / Where is all this data going
+* Packet analysis is a technique used to capture, intercept, and analyze packets
+* Tool names: packet sniffer, packet analyzer, protocol analyzer, network analyzer
+* Software: Wireshark, tcpdump, netsh
+* Work through the challenge using the attached task file and Wireshark as your analysis tool
+* Challenge
+   * Find HTTP GET requests : http.request.method == GET
+   * Find HTTP POST requests : http.request.method == POST
+   * Find DNS text messages : dns.txt
+   * Find clear text FTP commands : ftp
+   * Examine uploaded FTP data : ftp-data
+
