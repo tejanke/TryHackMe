@@ -279,3 +279,28 @@ McSkidy is back, yeah!
    * go
    * xp_cmdshell 'type c:\test.txt';
    * go
+
+# Task 17 - Day 12 - Networking / Sharing without caring
+* Review the server sending unusual traffic
+* Scan the target
+   ```
+   nmap -A -T4 -Pn 10.10.41.20
+   ```
+* NFS is running on the target, list the shares
+   ```
+   showmount -e 10.10.41.20
+   ```
+* Access a remote share
+   ```
+   cd /tmp
+   mkdir tmp2
+   mount 10.10.41.20:/confidential tmp2
+   cd tmp2
+   ls -lrta
+   ```
+* Grab the md5 sum of a file
+   ```
+   md5sum file.txt
+   ```
+
+# Task 18 - Day 13 - Networking / They lost the plan
