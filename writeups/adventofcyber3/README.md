@@ -375,3 +375,33 @@ McSkidy is back, yeah!
       cat /home/thegrinch/Desktop > /var/www/html/ls.html
       ```
 
+# Task 20 - Day 15 - Cyber Careers
+* Review Cyber Careers quiz
+
+# Task 21 - Day 16 - OSINT / Ransomware Madness
+* OSINT - Open Source Intelligence
+* Two places to find information
+   * Clearnet
+      * Facebook
+      * Twitter
+      * GitHub
+   * Darknet
+      * TOR
+      * Freenet
+      * I2P
+      * IPFS
+      * Zeronet
+* RIS Open Source Intelligence Cycle
+   * https://arnoreuser.com/wp-content/uploads/2018/12/201712-The-RIS-OSINT-Intelligence-Cycle.pdf
+   * 1 - Client
+   * 2 - Source
+   * 3 - Monitoring
+   * 4 - Selecting/Finding
+   * 5 - Acquisition
+   * 6 - Indexing
+   * 7 - Syntheses
+   * 8 - Dissemination
+* Google Dorking
+   * https://www.sans.org/posters/google-hacking-and-defense-cheat-sheet/
+* OSINT Challenge
+   * Use Google to search for keywords in the ransomware message.  Track the user through various social media to answer the questions.
