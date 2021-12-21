@@ -480,3 +480,22 @@ McSkidy is back, yeah!
       apt install jq -y
       cat manifest.json | jq
       ```
+
+# Task 24 - Day 19 - Blue Teaming / Something Phishy is going on
+* Phishing checks
+   * do you know the sender?
+   * does the email greet you personally?
+   * does the email contain grammar mistakes?
+   * does the email give a sense of urgency?
+   * does the email have weird links?
+   * does the email have weird attachments?
+* Challenge
+   * Review the example email and answer the questions
+   * Decode base64
+      ```
+      cat a.txt | base64 -d
+      ```
+   * Decode base64, save to file
+      ```
+      cat b.txt | base64 -d > file.pdf
+      ```
