@@ -499,3 +499,25 @@ McSkidy is back, yeah!
       ```
       cat b.txt | base64 -d > file.pdf
       ```
+
+# Task 25 - Day 20 - Blue Teaming / What's the worst that could happen?
+* Malware analysis VM : https://remnux.org/
+* File analysis
+   * file [file]
+   * strings [file]
+   * md5sum [file]
+* Virustotal : https://www.virustotal.com/gui/home/upload
+
+# Task 26 - Day 21 - Blue Teaming / Needles in computer stacks
+* YARA - multi platform tool for matching patterns of interest, used to identify malicious files
+* List of rules: https://github.com/InQuest/awesome-yara
+* yara rule
+   * rulename
+   * metadata
+   * strings
+   * conditions
+* syntax
+   * yara [yara_file]
+* options
+   * -m
+   * -n
