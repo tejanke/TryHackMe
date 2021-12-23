@@ -521,3 +521,14 @@ McSkidy is back, yeah!
 * options
    * -m
    * -n
+
+# Task 27 - Day 22 - Blue Teaming / How it happened
+* Tools
+   * CyberChef : https://gchq.github.io/CyberChef/
+   * Oledump : https://blog.didierstevens.com/programs/oledump-py/
+* XOR
+   * 1 = two values are different
+   * 0 = two values are alike
+* Challenge
+   * Use CyberChef and Oledump to answer the challenge questions
+      * python oledump.py [file] -s 4 -d
