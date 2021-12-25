@@ -556,3 +556,6 @@ McSkidy is back, yeah!
    ```
    john --format=NT -w=/usr/share/wordlists/rockyou.txt hash.txt
    ```
+
+# Task 30 - Day 25 - Feedback
+* Feedback and thanks
