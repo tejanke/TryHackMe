@@ -532,3 +532,27 @@ McSkidy is back, yeah!
 * Challenge
    * Use CyberChef and Oledump to answer the challenge questions
       * python oledump.py [file] -s 4 -d
+
+# Task 28 - Day 23 - Blue Teaming / PowershELlf Magic
+* PowerShell
+   * https://docs.microsoft.com/en-us/powershell/scripting/overview?view=powershell-7.2
+* Full Event Log Viewer
+   * https://www.nirsoft.net/utils/full_event_log_view.html
+* CyberChef
+   * https://gchq.github.io/CyberChef/
+* Challenge
+   * Use Full Event Log Viewer to answer the challenge questions, modify the decryptor file and place the encryption key and ciphertext inside to reveal the last clue
+
+# Task 29 - Day 24 - Post Exploitation
+* Post Exploitation
+* Hashing
+* Windows stores
+   * LAN Manager
+   * NT LAN Manager
+* LSASS
+* mimikatz
+   * https://github.com/gentilkiwi/mimikatz
+* john
+   ```
+   john --format=NT -w=/usr/share/wordlists/rockyou.txt hash.txt
+   ```
