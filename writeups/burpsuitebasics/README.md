@@ -60,3 +60,32 @@ Intro
 # Task 9 - FoxyProxy
 * FoxyProxy is a Firefox browser extension that allows easy redirection to Burp
 * By default Burp listens on 127.0.0.1:8080, FoxyProxy allows you to quickly turn off and on sending to Burp
+
+# Task 10 - Proxying HTTPS
+* To view HTTPS traffic in Burp you'll need to install the Burp CA
+* Turn on intercept mode and go to http://burp/cert, download the cert
+* In Firefox go to about:preferences and search for cert
+* Click View Certificates and then Import the downloaded cert
+
+# Task 11 - Burp Suite Browser
+* Burp comes with a builtin Chromium based browser that can be used as an alternative to setting up FoxyProxy or similar in your browser of choice
+* If you are running the Burp browser in a sandbox environment you will have to check "Allow the embedded browser to run without a sandbox" in Project options > MISC > Embedded Browser
+
+# Task 12 - Scoping and Targeting
+* Scoping allows you to filter out and display only what you are researching
+* Selecting a scope is found in the Target tab
+* If you'd like to restrict this further you can set "And URL Is in target scope" option in Proxy Options > Intercept Client Requests
+
+# Task 13 - Site map and issue definitions
+* Site map - allows you to map out the site, this is only done with manual browsing using the community edition, the pro edition allows an automated spider
+* Scope - control the output to display only what we are researching
+* Issue Definitions - list of web vulnerabilities
+
+# Task 14 - Example Attack
+* Navigate to the VM support site to create a ticket
+* Notice how there is client side filtering to prevent testing XSS
+* Setup Burp in intercept mode
+* Enter a valid email and submit the request, in Burp modify the request and replace the email with a XSS test like <script>alert("success")</script>, forward it along
+
+# Task 15 - Conclusion
+Conclusion
