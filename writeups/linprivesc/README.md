@@ -76,3 +76,14 @@ Intro
         * target: whoami
 
 # Task 6 - privilege escalation - sudo
+* sudo allows you to run a program with root privileges
+* to list what programs you can use with sudo, type sudo -l
+* you can perform privilege escalation with a number of commands that have been enabled for you with sudo
+    * https://gtfobins.github.io/
+* LD_PRELOAD is a function that allows any program to use shared libraries
+* some systems may have the LD_PRELOAD environment option enabled, if so you can exploit that
+* LD_PRELOAD exploitation works as follows
+    * check for the LD_PRELOAD option with env_keep - sudo -l
+    * write a simple c script and compile it as a shared object file, .so extension
+    * run the shared object file along with your sudo enabled command
+        * sudo LD_PRELOAD=/tmp/example.so find
