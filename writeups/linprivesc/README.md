@@ -87,3 +87,40 @@ Intro
     * write a simple c script and compile it as a shared object file, .so extension
     * run the shared object file along with your sudo enabled command
         * sudo LD_PRELOAD=/tmp/example.so find
+
+# Task 7 - privilege escalation - suid
+* file permissions : read, write, execute
+* SUID bit
+    * user executes file with permissions of file owner
+    ```
+    rw-rw-rw-
+      |
+      |--- SUID bit
+      |
+    rwSrw-rw-
+    ```
+* SGID bit
+    * user executes file with permissions of group owner
+    ```
+    rw-rw-rw-
+         |
+         |--- SGID bit
+         |
+    rw-rwSrw-    
+    ```
+* Searching for these types of files
+    ```
+    find / -perm -u=s -type f 2>/dev/null
+    find / -type f -perm -04000 -ls 2>/dev/null
+    ```
+* SUID escalation can be found using resources like gtfobins
+    * https://gtfobins.github.io/#+suid
+* taking advantage of base64 and SUID
+    * LFILE=/etc/shadow
+    * /usr/bin/base64 "$LFILE" | base64 --decode
+
+# Task 8 - privilege escalation - capabilities
+* capabilities changes the the binary instead of the user permission
+* getcap -r / 2>/dev/null
+
+# Task 9 - privilege escalation - cron jobs
