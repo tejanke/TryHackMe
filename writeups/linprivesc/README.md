@@ -124,3 +124,17 @@ Intro
 * getcap -r / 2>/dev/null
 
 # Task 9 - privilege escalation - cron jobs
+* cron jobs are used to run scripts or binaries at certain times
+* by default cron jobs are run with the privilege of the owner
+* cron jobs are stored as crontabs - cron tables
+* each user on the system has a crontab
+* /etc/crontab
+* challenge
+    * Login with the creds given.  Grab the number of cron jobs with cat /etc/crontab.  Look for an exploitable cron job.  Edit the backup.sh script and append commands that will cat out the flag and the /etc/shadow file into output you have access to
+
+# Task 10 - privilege escalation - path
+* you can hijack an application to run a script if a user has write permission in the path
+* PATH is an environmental variable that tells the OS wehre to search for executables
+* echo $PATH
+* challenge
+    * Login with the creds given.  Find writable directories with find / -writable 2>/dev/null.  Look for an interesting directory to write to.  Export that directory to the $PATH environment variable.  Create a simple bash script that will read the contents of the flag.  Run the test executable
