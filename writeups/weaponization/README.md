@@ -11,3 +11,4 @@ https://tryhackme.com/room/weaponization
 deploy VM
 
 # Task 3 - windows script host
+a
