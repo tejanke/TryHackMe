@@ -66,3 +66,39 @@ https://tryhackme.com/room/splunk2gcd5
     |  stats count by cookie 
     |  sort - count
     ```
+
+# task 5 - level 300 questions
+* Mallory and her macbook
+* some search queries that were helpful for me
+    ```
+    index="botsv2" mallory
+
+    index="botsv2" mallory host="MACLORY-AIR13" (*.ppt OR *.pptx)
+
+    index="botsv2" sourcetype=ps *.crypt
+
+    index="botsv2" kutekitten "\\/users\\/mkraeusen\\/*" 
+    |  stats count by columns.md5    
+    ```
+* virustotal was useful in learning more about the file hash
+
+# task 6 - level 400 questions
+* Forthly vs APT
+* some search queries that were helpful for me
+    ```
+    index="botsv2" attachment sourcetype="stream:smtp"
+    | stats count by attach_filename{}
+
+    index="botsv2" invoice.zip password
+
+    index="botsv2" 45.77.65.211 sourcetype="stream:TCP" ssl_issuer="*"
+
+    index="botsv2" winsys32.dll
+
+    index="botsv2" sourcetype="stream:ftp"
+
+    index="botsv2" sourcetype="stream:ftp" method=RETR
+
+    index="botsv2" \\Software\\Microsoft\\Network sourcetype=WinRegistry data="*"
+    ```
+* virustotal and the other links were useful in learning more about the file
