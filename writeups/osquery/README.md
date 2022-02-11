@@ -188,3 +188,6 @@ osquery> select * from services limit 1;
 ```
 osquery> select display_name, description from services where display_name like 'Windows Defender%';
 ```
+
+# Task 10 - Conclusion
+Conclusion
